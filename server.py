@@ -4,6 +4,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import logging
+from config import Config
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -14,6 +15,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
+config = Config.get_config()
 
 # Configure CORS
 CORS(app)
@@ -24,7 +26,12 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 # Test endpoint
 @app.route('/test', methods=['GET'])
 def test():
-    return jsonify({'status': 'ok', 'message': 'Server is running'})
+    return jsonify({
+        'status': 'ok',
+        'environment': os.getenv('ENVIRONMENT', 'development'),
+        'server_url': config.SERVER_URL,
+        'debug_mode': config.DEBUG
+    })
 
 @app.route('/generate', methods=['POST'])
 def generate():
