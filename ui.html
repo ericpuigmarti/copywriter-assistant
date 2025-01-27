@@ -323,6 +323,19 @@
         .results-actions .action-btn {
             padding: 0.5rem 1rem;
         }
+
+        .guidelines-textarea {
+            height: 120px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .setting-help {
+            font-size: 12px;
+            color: var(--secondary-text);
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -408,6 +421,18 @@
                         </select>
                     </div>
                 </div>
+                <div class="settings-section">
+                    <div class="settings-section-title">Brand Guidelines</div>
+                    <div class="setting-item">
+                        <label for="brandGuidelines">Brand Voice & Style</label>
+                        <textarea 
+                            id="brandGuidelines" 
+                            class="textarea guidelines-textarea" 
+                            placeholder="Enter your brand guidelines here. Example: Our brand voice is friendly but professional, using simple language and avoiding jargon. We prefer active voice and short sentences."
+                        ></textarea>
+                        <p class="setting-help">These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -426,7 +451,10 @@
         const resultsView = document.getElementById('resultsView');
         const backToEditButton = document.getElementById('backToEdit');
         const applyToFigmaButton = document.getElementById('applyToFigma');
-        let currentProcessedText = '';
+        const brandGuidelinesTextarea = document.getElementById('brandGuidelines');
+        let currentProcessedTexts = [];
+        let selectedTexts = new Map(); // Store text layers with their IDs
+        let currentLanguage = 'es'; // Default language
 
         // Enable/disable action buttons based on text content
         textEditor.addEventListener('input', () => {
@@ -463,143 +491,142 @@
             }, '*');
         });
 
-        // Action buttons
-        translateButton.addEventListener('click', async () => {
-            const text = textEditor.value;
-            loadingIndicator.style.display = 'block';
-            try {
-                const response = await fetch('http://localhost:5000/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: text,
-                        action: 'Translate',
-                        targetLanguage: targetLanguageSelect.value
-                    })
-                });
-                const data = await response.json();
-                
-                // Store the processed text
-                currentProcessedText = data.response;
-                
-                // Show results view
-                document.getElementById('originalText').textContent = text;
-                document.getElementById('processedText').textContent = currentProcessedText;
-                document.getElementById('resultsView').style.display = 'block';
-                textEditor.style.display = 'none';
-                document.querySelector('.action-panel').style.display = 'none';
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        });
-
-        enhanceButton.addEventListener('click', async () => {
-            const text = textEditor.value;
-            loadingIndicator.style.display = 'block';
-            try {
-                const response = await fetch('http://localhost:5000/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: text,
-                        action: 'Enhance'
-                    })
-                });
-                const data = await response.json();
-                
-                // Store the processed text
-                currentProcessedText = data.response;
-                
-                // Show results view
-                document.getElementById('originalText').textContent = text;
-                document.getElementById('processedText').textContent = currentProcessedText;
-                document.getElementById('resultsView').style.display = 'block';
-                textEditor.style.display = 'none';
-                document.querySelector('.action-panel').style.display = 'none';
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        });
-
-        shortenButton.addEventListener('click', async () => {
-            const text = textEditor.value;
-            loadingIndicator.style.display = 'block';
-            try {
-                const response = await fetch('http://localhost:5000/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: text,
-                        action: 'Shorten'
-                    })
-                });
-                const data = await response.json();
-                
-                // Store the processed text
-                currentProcessedText = data.response;
-                
-                // Show results view
-                document.getElementById('originalText').textContent = text;
-                document.getElementById('processedText').textContent = currentProcessedText;
-                document.getElementById('resultsView').style.display = 'block';
-                textEditor.style.display = 'none';
-                document.querySelector('.action-panel').style.display = 'none';
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        });
-
-        // Add back to edit functionality
-        backToEditButton.addEventListener('click', () => {
-            document.getElementById('resultsView').style.display = 'none';
-            textEditor.style.display = 'block';
-            document.querySelector('.action-panel').style.display = 'grid';
-        });
-
-        // Add apply to Figma functionality
-        applyToFigmaButton.addEventListener('click', () => {
+        // Save brand guidelines when changed
+        brandGuidelinesTextarea.addEventListener('change', () => {
             parent.postMessage({
                 pluginMessage: {
-                    type: 'update-text',
-                    text: currentProcessedText
+                    type: 'save-brand-guidelines',
+                    guidelines: brandGuidelinesTextarea.value
                 }
             }, '*');
-            
-            // Reset UI to edit view with the new text
-            textEditor.value = currentProcessedText;
-            textEditor.dispatchEvent(new Event('input'));
-            document.getElementById('resultsView').style.display = 'none';
-            textEditor.style.display = 'block';
-            document.querySelector('.action-panel').style.display = 'grid';
         });
 
-        // Handle messages from the plugin
+        // Load saved brand guidelines
+        parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+
+        // Update the message handler
         window.onmessage = (event) => {
             const msg = event.data.pluginMessage;
             if (!msg) return;
 
             switch (msg.type) {
                 case 'selected-text':
-                    console.log('Received selected text:', msg.text);
-                    textEditor.value = msg.text;
+                    console.log('Received selected texts:', msg.texts);
+                    selectedTexts.clear();
+                    let combinedText = '';
+                    
+                    msg.texts.forEach(item => {
+                        selectedTexts.set(item.id, item.text);
+                        combinedText += item.text + '\n\n';
+                    });
+                    
+                    textEditor.value = combinedText.trim();
                     textEditor.dispatchEvent(new Event('input'));
                     break;
                 case 'set-language':
+                    console.log('Setting language to:', msg.language);
                     if (msg.language) {
                         targetLanguageSelect.value = msg.language;
+                        // Store the language in a variable for immediate access
+                        currentLanguage = msg.language;
+                    }
+                    break;
+                case 'set-brand-guidelines':
+                    if (msg.guidelines) {
+                        brandGuidelinesTextarea.value = msg.guidelines;
                     }
                     break;
             }
         };
 
-        // Request initial selected text
-        parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
+        // Update the processing functions
+        async function processAndUpdateText(action, targetLanguage = '') {
+            loadingIndicator.style.display = 'block';
+            const processedTexts = [];
+
+            try {
+                // Process each text separately
+                for (const [id, text] of selectedTexts) {
+                    console.log('Processing text with language:', targetLanguage);
+                    const response = await fetch('http://localhost:5000/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            text: text,
+                            action: action,
+                            targetLanguage: targetLanguage,
+                            brandGuidelines: brandGuidelinesTextarea.value
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    processedTexts.push({
+                        id: id,
+                        originalText: text,
+                        processedText: data.response
+                    });
+                }
+
+                // Update UI with results
+                document.getElementById('originalText').innerHTML = processedTexts
+                    .map(item => item.originalText)
+                    .join('\n\n');
+                document.getElementById('processedText').innerHTML = processedTexts
+                    .map(item => item.processedText)
+                    .join('\n\n');
+
+                // Store for applying to Figma
+                currentProcessedTexts = processedTexts;
+
+                // Show results view
+                document.getElementById('resultsView').style.display = 'block';
+                textEditor.style.display = 'none';
+                document.querySelector('.action-panel').style.display = 'none';
+
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // Update apply to Figma functionality
+        applyToFigmaButton.addEventListener('click', () => {
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'update-text',
+                    processedTexts: currentProcessedTexts.map(item => ({
+                        id: item.id,
+                        text: item.processedText
+                    }))
+                }
+            }, '*');
+            
+            // Reset UI
+            document.getElementById('resultsView').style.display = 'none';
+            textEditor.style.display = 'block';
+            document.querySelector('.action-panel').style.display = 'grid';
+        });
+
+        // Update action button handlers
+        translateButton.addEventListener('click', () => {
+            const language = targetLanguageSelect.value || currentLanguage;
+            console.log('Translation requested with language:', language);
+            processAndUpdateText('Translate', language);
+        });
+        enhanceButton.addEventListener('click', () => 
+            processAndUpdateText('Enhance'));
+        shortenButton.addEventListener('click', () => 
+            processAndUpdateText('Shorten'));
+
+        // Request saved settings on load
+        window.onload = () => {
+            console.log('Requesting saved settings...');
+            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+        };
     </script>
 </body>
 </html>
