@@ -1,18 +1,30 @@
 # Copywriting Assistant
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.2-blue)
 
 A Figma plugin that helps you enhance, translate, and optimize your copy directly within Figma.
 
 ## Current Features
 
 - **Text Enhancement**: Improve your copy while maintaining brand voice and style
-- **Translation**: Translate your text to multiple languages
+- **Translation**: Translate your text to multiple languages while preserving brand tone
 - **Text Shortening**: Create more concise versions of your copy
 - **Brand Guidelines**: Input your brand guidelines to maintain consistent voice and style
-- **Dark Mode Support**: Comfortable viewing in any lighting condition
 - **Local Backend**: Flask server for secure API handling
+- **Settings Persistence**: Saves your language and brand guidelines preferences
+
+## Brand Voice Management
+
+The plugin now includes robust brand voice management:
+- Input detailed brand guidelines in the settings
+- Guidelines are applied to all text operations
+- Maintains consistent brand voice across translations
+- Preserves tone and style in shortened text
+- Enhances text while adhering to brand standards
+
+## Future Features
+- **Dark Mode Support**: Comfortable viewing in any lighting condition
 
 ## Setup Instructions
 

@@ -42,21 +42,32 @@ def generate():
         text = data.get('text', '')
         action = data.get('action', '')
         target_language = data.get('targetLanguage', '')
+        brand_guidelines = data.get('brandGuidelines', '')
 
         logger.debug(f"Processing request - Action: {action}, Text: {text}, Language: {target_language}")
+
+        # Verify we have a language for translation
+        if action == 'Translate' and not target_language:
+            logger.error("No target language provided for translation")
+            return jsonify({'error': 'Target language is required for translation'}), 400
 
         # Verify API key
         if not os.getenv('OPENAI_API_KEY'):
             logger.error("OpenAI API key not found")
             return jsonify({'error': 'OpenAI API key not configured'}), 500
 
-        # Construct prompt
+        # Create base system message
+        system_message = "You are a helpful copywriting assistant."
+        if brand_guidelines:
+            system_message += f"\n\nBrand Guidelines:\n{brand_guidelines}"
+
+        # Construct prompt based on action
         if action == 'Translate':
-            prompt = f"Translate this text to {target_language}:\n\n{text}"
+            prompt = f"Translate this text to {target_language} while maintaining the brand voice and style. The translation must be in {target_language}:\n\n{text}"
         elif action == 'Enhance':
-            prompt = f"Enhance this text while maintaining its core message:\n\n{text}"
+            prompt = f"Enhance this text while maintaining the brand voice and style:\n\n{text}"
         elif action == 'Shorten':
-            prompt = f"Create a shorter version of this text while keeping the main points:\n\n{text}"
+            prompt = f"Create a shorter version of this text while maintaining the brand voice and style:\n\n{text}"
         else:
             logger.error(f"Invalid action: {action}")
             return jsonify({'error': 'Invalid action'}), 400
@@ -67,7 +78,7 @@ def generate():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a helpful copywriting assistant."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
