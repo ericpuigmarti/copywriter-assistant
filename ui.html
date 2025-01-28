@@ -286,42 +286,86 @@
             color: #0062ff;
         }
 
-        .results {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: var(--input-bg);
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .results-column {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
             border: 1px solid var(--border-color);
             border-radius: 6px;
+            background-color: var(--input-bg);
         }
 
-        .results h3 {
-            font-size: 0.875rem;
+        .results-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--button-bg);
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-header h3 {
+            margin: 0;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--secondary-text);
+            color: var(--text-color);
         }
 
-        .results p {
-            font-size: 0.875rem;
+        .results-content {
+            padding: 16px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .results-content p {
+            margin: 0;
+            font-size: 14px;
             line-height: 1.5;
-            margin-bottom: 1rem;
             white-space: pre-wrap;
         }
 
-        .results p:last-child {
-            margin-bottom: 0;
+        .results-divider {
+            display: flex;
+            justify-content: center;
+            color: var(--secondary-text);
+            height: 24px;
+        }
+
+        .original {
+            background-color: var(--input-bg);
+            color: var(--secondary-text);
+        }
+
+        .processed {
+            background-color: var(--input-bg);
+            color: var(--text-color);
         }
 
         .results-actions {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
+            padding: 16px 0 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 16px;
         }
 
-        .results-actions .action-btn {
-            padding: 0.5rem 1rem;
+        /* Add smooth transitions */
+        .results-content, .results-header {
+            transition: background-color 0.2s ease;
+        }
+
+        /* Hover effects */
+        .results-column:hover {
+            border-color: var(--button-hover);
         }
 
         .guidelines-textarea {
@@ -336,12 +380,33 @@
             color: var(--secondary-text);
             margin-top: 4px;
         }
+
+        /* Change indicator styles */
+        .change-indicator {
+            display: none;
+        }
+
+        .change-type {
+            display: none;
+        }
+
+        .highlight-add {
+            display: none;
+        }
+
+        .highlight-remove {
+            display: none;
+        }
+
+        .highlight-modify {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>Copywriter Assistant</h1>
+            <!-- <h1>Copywriter Assistant</h1> -->
             <button id="settingsButton" class="text-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 Settings
@@ -371,17 +436,35 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Back to Edit
                 </button>
-                <div class="results">
-                    <h3>Original:</h3>
-                    <p id="originalText"></p>
-                    <h3>Processed:</h3>
-                    <p id="processedText"></p>
-                    <div class="results-actions">
-                        <button id="applyToFigma" class="action-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Apply to Figma
-                        </button>
+                <div class="results-container">
+                    <div class="results-column">
+                        <div class="results-header">
+                            <h3>Original Text</h3>
+                        </div>
+                        <div class="results-content original">
+                            <p id="originalText"></p>
+                        </div>
                     </div>
+                    <div class="results-divider">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="7 13 12 18 17 13"></polyline>
+                            <polyline points="7 6 12 11 17 6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="results-column">
+                        <div class="results-header">
+                            <h3>Processed Text</h3>
+                        </div>
+                        <div class="results-content processed">
+                            <p id="processedText"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="results-actions">
+                    <button id="applyToFigma" class="action-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Apply to Figma
+                    </button>
                 </div>
             </div>
         </main>
@@ -454,7 +537,6 @@
         const brandGuidelinesTextarea = document.getElementById('brandGuidelines');
         let currentProcessedTexts = [];
         let selectedTexts = new Map(); // Store text layers with their IDs
-        let currentLanguage = 'es'; // Default language
 
         // Enable/disable action buttons based on text content
         textEditor.addEventListener('input', () => {
@@ -524,16 +606,8 @@
                     textEditor.dispatchEvent(new Event('input'));
                     break;
                 case 'set-language':
-                    console.log('Setting language to:', msg.language);
                     if (msg.language) {
                         targetLanguageSelect.value = msg.language;
-                        // Store the language in a variable for immediate access
-                        currentLanguage = msg.language;
-                    }
-                    break;
-                case 'set-brand-guidelines':
-                    if (msg.guidelines) {
-                        brandGuidelinesTextarea.value = msg.guidelines;
                     }
                     break;
             }
@@ -612,21 +686,13 @@
 
         // Update action button handlers
         translateButton.addEventListener('click', () => {
-            const language = targetLanguageSelect.value || currentLanguage;
-            console.log('Translation requested with language:', language);
-            processAndUpdateText('Translate', language);
+            console.log('Translation requested with language:', targetLanguageSelect.value);
+            processAndUpdateText('Translate', targetLanguageSelect.value);
         });
         enhanceButton.addEventListener('click', () => 
             processAndUpdateText('Enhance'));
         shortenButton.addEventListener('click', () => 
             processAndUpdateText('Shorten'));
-
-        // Request saved settings on load
-        window.onload = () => {
-            console.log('Requesting saved settings...');
-            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
-        };
     </script>
 </body>
 </html>

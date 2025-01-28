@@ -1,7 +1,40 @@
 # Changelog
 
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
-> Note: When updating this changelog, remember to update the version badge in README.md
+> Note: When updating this changelog, remember to update the version badge and details in README.md
+
+## [0.1.7] - 2024-01-24
+
+### Changed
+- Improved results view layout with vertical stacking
+- Enhanced readability of original vs processed text
+- Updated results divider for vertical orientation
+- Optimized spacing in results view
+
+### Technical
+- Refactored results container CSS for vertical layout
+- Simplified results view structure
+- Improved responsive behavior
+
+## [0.1.6] - 2024-01-24
+
+### Added
+- Configuration management system
+- Environment-specific settings
+- Server status endpoint with environment info
+- Static assets organization
+
+### Changed
+- Improved server configuration structure
+- Enhanced error handling and logging
+- Updated README with clearer feature descriptions
+- Reorganized future features list
+
+### Technical
+- Added config.py for configuration management
+- Structured static assets directory
+- Updated server initialization process
+- Enhanced environment handling
 
 ## [0.1.5] - 2024-01-24
 
@@ -119,4 +152,30 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - OpenAI GPT-3.5 Turbo integration
 - CORS configuration for local development
 - Environment variable management
-- Proper gitignore setup 
+- Proper gitignore setup
+
+## [0.1.8] - 2024-01-24
+
+### Added
+- New feature description
+
+### Changed
+- Updated feature description
+
+### Technical
+- Added new feature implementation
+- Updated API endpoint to handle new feature
+- Enhanced system prompts with new feature context
+
+## [0.1.9] - 2024-01-24
+
+### Added
+- New feature description
+
+### Changed
+- Updated feature description
+
+### Technical
+- Added new feature implementation
+- Updated API endpoint to handle new feature
+- Enhanced system prompts with new feature context 
