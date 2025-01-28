@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from config import Config
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -18,7 +19,13 @@ app = Flask(__name__)
 config = Config.get_config()
 
 # Configure CORS
-CORS(app)
+CORS(app, resources={
+    r"/*": {
+        "origins": ["*"],
+        "methods": ["POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Accept"]
+    }
+})
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -33,78 +40,141 @@ def test():
         'debug_mode': config.DEBUG
     })
 
-@app.route('/generate', methods=['POST'])
-def generate():
+@app.route('/enhance', methods=['POST'])
+def enhance():
     try:
-        # Log the incoming request
-        logger.debug("Received request")
-        logger.debug(f"Headers: {request.headers}")
-        logger.debug(f"Data: {request.get_data(as_text=True)}")
-
         data = request.json
-        if not data:
-            logger.error("No JSON data received")
-            return jsonify({'error': 'No data provided'}), 400
-
         text = data.get('text', '')
-        action = data.get('action', '')
-        target_language = data.get('targetLanguage', '')
-        brand_guidelines = data.get('brandGuidelines', '')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
 
-        logger.debug(f"Processing request - Action: {action}, Text: {text}, Language: {target_language}")
-
-        # Verify we have a language for translation
-        if action == 'Translate' and not target_language:
-            logger.error("No target language provided for translation")
-            return jsonify({'error': 'Target language is required for translation'}), 400
-
-        # Verify API key
-        if not os.getenv('OPENAI_API_KEY'):
-            logger.error("OpenAI API key not found")
-            return jsonify({'error': 'OpenAI API key not configured'}), 500
-
-        # Create base system message
-        system_message = "You are a helpful copywriting assistant."
-        if brand_guidelines:
-            system_message += f"\n\nBrand Guidelines:\n{brand_guidelines}"
-
-        # Construct prompt based on action
-        if action == 'Translate':
-            prompt = f"Translate this text to {target_language} while maintaining the brand voice and style. The translation must be in {target_language}:\n\n{text}"
-        elif action == 'Enhance':
-            prompt = f"Enhance this text while maintaining the brand voice and style:\n\n{text}"
-        elif action == 'Shorten':
-            prompt = f"Create a shorter version of this text while maintaining the brand voice and style:\n\n{text}"
-        else:
-            logger.error(f"Invalid action: {action}")
-            return jsonify({'error': 'Invalid action'}), 400
-
-        logger.debug(f"Sending request to OpenAI with prompt: {prompt}")
-
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=1000
-            )
-            logger.debug("Received response from OpenAI")
-            logger.debug(f"OpenAI response: {response}")
-
-            processed_text = response.choices[0].message.content.strip()
-            logger.debug(f"Processed text: {processed_text}")
-            
-            return jsonify({'response': processed_text})
-
-        except Exception as api_error:
-            logger.error(f"OpenAI API Error: {str(api_error)}")
-            return jsonify({'error': str(api_error)}), 500
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful copywriting assistant."},
+                {"role": "user", "content": f"Enhance this text:\n\n{text}"}
+            ]
+        )
+        
+        enhanced_text = response.choices[0].message.content.strip()
+        return jsonify({'enhancedText': enhanced_text})
 
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+        logger.error(f"Enhancement error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/shorten', methods=['POST'])
+def shorten():
+    try:
+        data = request.json
+        text = data.get('text', '')
+        
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful copywriting assistant."},
+                {"role": "user", "content": f"Create a shorter version of this text:\n\n{text}"}
+            ]
+        )
+        
+        shortened_text = response.choices[0].message.content.strip()
+        return jsonify({'shortenedText': shortened_text})
+
+    except Exception as e:
+        logger.error(f"Shortening error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    try:
+        data = request.json
+        text = data.get('text', '')
+        target_language = data.get('targetLanguage', '')
+        
+        if not text or not target_language:
+            return jsonify({'error': 'Text and target language are required'}), 400
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful translation assistant."},
+                {"role": "user", "content": f"Translate this text to {target_language}:\n\n{text}"}
+            ]
+        )
+        
+        translated_text = response.choices[0].message.content.strip()
+        return jsonify({'translatedText': translated_text})
+
+    except Exception as e:
+        logger.error(f"Translation error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# Add quality check endpoint
+@app.route('/quality-check', methods=['POST'])
+def quality_check():
+    try:
+        data = request.json
+        text = data.get('text', '')
+        brand_guidelines = data.get('brandGuidelines', '')
+
+        # Basic text metrics
+        char_count = len(text)
+        word_count = len(text.split())
+        sentences = len(re.split(r'[.!?]+', text))
+        
+        # Estimate reading and speaking times
+        reading_time = round(word_count / 250 * 60)  # Average reading speed: 250 words/min
+        speaking_time = round(word_count / 150 * 60)  # Average speaking speed: 150 words/min
+
+        # Calculate average word length
+        word_length = round(char_count / word_count, 1) if word_count > 0 else 0
+        
+        # Calculate average sentence length
+        sentence_length = round(word_count / sentences, 1) if sentences > 0 else 0
+
+        # Get quality score from OpenAI
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": open('system_prompt_qualityCheck.txt').read()},
+                {"role": "user", "content": text}
+            ]
+        )
+        
+        # Extract score from response with better error handling
+        response_text = response.choices[0].message.content
+        try:
+            # Look for "Score: X/100" pattern
+            score_match = re.search(r'Score:\s*(\d+)', response_text)
+            if score_match:
+                score = int(score_match.group(1))
+            else:
+                # Fallback to a default score if pattern not found
+                score = 70
+                logger.warning(f"Could not extract score from response: {response_text}")
+        except Exception as e:
+            logger.error(f"Error parsing score: {e}")
+            score = 70  # Default score if parsing fails
+
+        return jsonify({
+            'score': score,
+            'metrics': {
+                'characters': char_count,
+                'words': word_count,
+                'sentences': sentences,
+                'readingTime': reading_time,
+                'speakingTime': speaking_time,
+                'wordLength': word_length,
+                'sentenceLength': sentence_length
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"Quality check error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

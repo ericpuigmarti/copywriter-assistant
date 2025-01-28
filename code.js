@@ -2,26 +2,7 @@
 figma.showUI(__html__, { width: 400, height: 600 });
 
 // Add a global variable to store text mappings
-let selectedTextLayers = new Map(); // Maps layer IDs to their text content
-
-// Function to extract text from a node and its children
-function extractTextFromNode(node) {
-    let textNodes = [];
-    
-    if (node.type === 'TEXT') {
-        textNodes.push({
-            id: node.id,
-            text: node.characters,
-            node: node
-        });
-    } else if ('children' in node) {
-        for (const child of node.children) {
-            textNodes = textNodes.concat(extractTextFromNode(child));
-        }
-    }
-    
-    return textNodes;
-}
+let selectedTextLayers = new Map();
 
 // Function to handle text extraction
 function handleSelection() {
@@ -35,10 +16,16 @@ function handleSelection() {
         
         // Process each selected node
         for (const node of selection) {
-            allTextNodes = allTextNodes.concat(extractTextFromNode(node));
+            if (node.type === 'TEXT') {
+                allTextNodes.push({
+                    id: node.id,
+                    text: node.characters,
+                    node: node
+                });
+            }
         }
         
-        // Store text nodes in our Map and prepare text for UI
+        // Send extracted text to UI
         const textsForUI = allTextNodes.map(item => {
             if (item.text.trim().length > 0) {
                 selectedTextLayers.set(item.id, {
@@ -72,7 +59,7 @@ figma.on('selectionchange', () => {
     handleSelection();
 });
 
-// Handle messages received from the UI
+// Handle messages from UI
 figma.ui.onmessage = async (msg) => {
     console.log('Message received from UI:', msg);
 
@@ -135,17 +122,43 @@ figma.ui.onmessage = async (msg) => {
             break;
 
         case 'save-brand-guidelines':
-            console.log('Saving brand guidelines');
+            console.log('Saving brand guidelines:', msg.guidelines);
             await figma.clientStorage.setAsync('brandGuidelines', msg.guidelines);
             break;
 
         case 'get-brand-guidelines':
             console.log('Getting saved brand guidelines');
             const savedGuidelines = await figma.clientStorage.getAsync('brandGuidelines');
+            console.log('Saved guidelines:', savedGuidelines);
             figma.ui.postMessage({
                 type: 'set-brand-guidelines',
                 guidelines: savedGuidelines || ''
             });
             break;
+
+        case 'save-theme':
+            console.log('Saving theme preference:', msg.theme);
+            await figma.clientStorage.setAsync('theme', msg.theme);
+            break;
+
+        case 'get-theme':
+            console.log('Getting saved theme');
+            const savedTheme = await figma.clientStorage.getAsync('theme');
+            figma.ui.postMessage({
+                type: 'set-theme',
+                theme: savedTheme || 'system'
+            });
+            break;
     }
 };
+
+// Handle initial selection
+figma.ui.postMessage({
+    type: 'selected-text',
+    texts: figma.currentPage.selection
+        .filter(node => node.type === "TEXT")
+        .map(node => ({
+            id: node.id,
+            text: node.characters
+        }))
+});
