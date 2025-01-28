@@ -1,18 +1,19 @@
 # Copywriting Assistant
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/version-0.1.2-blue)
+![Version](https://img.shields.io/badge/version-0.1.6-blue)
 
-A Figma plugin that helps you enhance, translate, and optimize your copy directly within Figma.
+A Figma plugin that helps you enhance, translate, and optimize your UX copy directly within Figma.
 
 ## Current Features
 
 - **Text Enhancement**: Improve your copy while maintaining brand voice and style
 - **Translation**: Translate your text to multiple languages while preserving brand tone
 - **Text Shortening**: Create more concise versions of your copy
+- **Batch Processing**: Select and process multiple text layers simultaneously
 - **Brand Guidelines**: Input your brand guidelines to maintain consistent voice and style
-- **Local Backend**: Flask server for secure API handling
 - **Settings Persistence**: Saves your language and brand guidelines preferences
+- **Local Backend**: Flask server for secure API handling
 
 ## Brand Voice Management
 
@@ -23,8 +24,26 @@ The plugin now includes robust brand voice management:
 - Preserves tone and style in shortened text
 - Enhances text while adhering to brand standards
 
+## How It Works
+
+1. Select one or more text layers in your Figma design
+2. Choose your desired action (enhance, translate, or shorten)
+3. Review the processed text
+4. Apply changes to update your designs
+
 ## Future Features
 - **Dark Mode Support**: Comfortable viewing in any lighting condition
+- **Custom Presets**: Save frequently used text patterns and styles
+- **Smart Suggestions**: AI-powered recommendations for better copy
+- **Character Count Limits**: Set and enforce text length constraints
+- **Accessibility Checker**: Verify text meets accessibility standards
+- **Team Collaboration**: Share and review copy changes with team members
+- **Context Awareness**: Adapt copy based on component type (button, header, etc.)
+- **Bulk Operations**: Process entire pages or components at once
+- **Voice Tone Slider**: Adjust copy formality/tone on a scale
+- **Component-Specific Rules**: Different guidelines for different UI elements
+- **Copy Validation**: Check for common UX writing issues
+
 
 ## Setup Instructions
 
@@ -68,28 +87,6 @@ The plugin now includes robust brand voice management:
 6. Select text in your Figma design
 7. Open the plugin and choose your desired action
 
-
-## Planned Features
-
-### PDF Brand Guidelines Upload 📄
-- Upload brand guidelines directly from PDF documents
-- Automatic extraction and processing of guidelines
-- Smart parsing of key brand voice and style elements
-- Version control for different guideline documents
-
-### Enhanced Multi-Language Support 🌐
-- Support for additional languages
-- Regional language variants
-- Preservation of text formatting during translation
-- Contextual translation based on design context
-- Batch translation of multiple text layers
-
-### Automated Layer Updates ⚡
-- Direct updating of original Figma layers with processed text
-- Maintain layer properties and styles
-- Smart text fitting for translated content
-- Batch processing of multiple layers
-- History of changes with undo capability
 
 ## Getting Started with Development
 

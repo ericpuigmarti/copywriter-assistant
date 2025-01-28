@@ -82,24 +82,25 @@
         }
 
         .action-panel {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
         }
 
         .action-btn {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 8px;
-            padding: 0.75rem;
-            border-radius: 6px;
-            background-color: var(--button-bg);
+            width: 100%;
+            padding: 12px;
             border: none;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-radius: 8px;
+            background-color: var(--button-bg);
             color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
         }
 
         .action-btn:hover {
@@ -115,7 +116,6 @@
             width: 16px;
             height: 16px;
             flex-shrink: 0;
-            stroke: currentColor;
         }
 
         .loading {
@@ -401,6 +401,23 @@
         .highlight-modify {
             display: none;
         }
+
+        .save-confirmation {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #4CAF50;
+            margin-top: 4px;
+        }
+
+        .save-confirmation.visible {
+            display: flex;
+        }
+
+        .save-confirmation svg {
+            stroke: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -421,7 +438,7 @@
                 </button>
                 <button id="enhanceButton" class="action-btn" disabled>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    Enhance
+                    Improve it
                 </button>
                 <button id="shortenButton" class="action-btn" disabled>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
@@ -513,6 +530,12 @@
                             class="textarea guidelines-textarea" 
                             placeholder="Enter your brand guidelines here. Example: Our brand voice is friendly but professional, using simple language and avoiding jargon. We prefer active voice and short sentences."
                         ></textarea>
+                        <div id="saveConfirmation" class="save-confirmation">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Changes saved</span>
+                        </div>
                         <p class="setting-help">These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
                     </div>
                 </div>
@@ -537,6 +560,10 @@
         const brandGuidelinesTextarea = document.getElementById('brandGuidelines');
         let currentProcessedTexts = [];
         let selectedTexts = new Map(); // Store text layers with their IDs
+
+        // Add save confirmation element
+        const saveConfirmation = document.getElementById('saveConfirmation');
+        let saveTimeout;
 
         // Enable/disable action buttons based on text content
         textEditor.addEventListener('input', () => {
@@ -573,18 +600,32 @@
             }, '*');
         });
 
-        // Save brand guidelines when changed
-        brandGuidelinesTextarea.addEventListener('change', () => {
+        // Update brand guidelines save handler
+        brandGuidelinesTextarea.addEventListener('input', () => {
+            console.log('Saving brand guidelines:', brandGuidelinesTextarea.value);
             parent.postMessage({
                 pluginMessage: {
                     type: 'save-brand-guidelines',
                     guidelines: brandGuidelinesTextarea.value
                 }
             }, '*');
+
+            // Show save confirmation
+            saveConfirmation.classList.add('visible');
+
+            // Hide confirmation after 2 seconds
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                saveConfirmation.classList.remove('visible');
+            }, 2000);
         });
 
-        // Load saved brand guidelines
-        parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+        // Request saved settings on plugin load
+        window.onload = () => {
+            console.log('Requesting saved settings...');
+            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+        };
 
         // Update the message handler
         window.onmessage = (event) => {
@@ -608,6 +649,12 @@
                 case 'set-language':
                     if (msg.language) {
                         targetLanguageSelect.value = msg.language;
+                    }
+                    break;
+                case 'set-brand-guidelines':
+                    console.log('Setting brand guidelines:', msg.guidelines);
+                    if (msg.guidelines !== undefined) {
+                        brandGuidelinesTextarea.value = msg.guidelines;
                     }
                     break;
             }

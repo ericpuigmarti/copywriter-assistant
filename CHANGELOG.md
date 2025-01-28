@@ -156,26 +156,52 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 
 ## [0.1.8] - 2024-01-24
 
-### Added
-- New feature description
-
 ### Changed
-- Updated feature description
+- Complete UI redesign to match Figma's dark theme
+- Improved button layout and styling
+- Moved settings to footer navigation
+- Enhanced overall visual hierarchy
+
+### Added
+- Dark mode as default theme
+- Full-width action buttons
+- Footer navigation bar
+- Help button in footer
 
 ### Technical
-- Added new feature implementation
-- Updated API endpoint to handle new feature
-- Enhanced system prompts with new feature context
+- Refactored CSS variables for dark theme
+- Updated component structure
+- Improved responsive layout
+- Enhanced button states and transitions
 
 ## [0.1.9] - 2024-01-24
 
-### Added
-- New feature description
+### Fixed
+- Brand guidelines persistence across plugin sessions
+- Settings synchronization for brand guidelines
+- Guidelines loading on plugin startup
 
 ### Changed
-- Updated feature description
+- Improved brand guidelines save behavior
+- Enhanced settings persistence logic
 
 ### Technical
-- Added new feature implementation
-- Updated API endpoint to handle new feature
-- Enhanced system prompts with new feature context 
+- Updated client storage handling for guidelines
+- Added debug logging for settings persistence
+- Improved settings synchronization
+
+## [0.2.0] - 2024-01-24
+
+### Added
+- Save confirmation indicator for brand guidelines
+- Visual feedback for settings changes
+- Auto-hiding save confirmation
+
+### Changed
+- Improved user feedback for settings persistence
+- Enhanced visual feedback for user actions
+
+### Technical
+- Added save confirmation component
+- Implemented auto-hiding confirmation message
+- Enhanced UI feedback system 
