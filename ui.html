@@ -6,16 +6,67 @@
     <title>Copywriter Assistant</title>
     <style>
         /* Theme variables */
-        :root {
-            --background-color: #ffffff;
-            --text-color: #333333;
-            --border-color: #e5e5e5;
-            --button-bg: #f3f4f6;
-            --button-hover: #e5e7eb;
-            --input-bg: #ffffff;
-            --header-bg: #ffffff;
-            --modal-bg: #ffffff;
+        :root[data-theme="light"] {
+            --background-color: #FFFFFF;
+            --surface-color: #F8F8F8;
+            --text-color: #1A1A1A;
             --secondary-text: #666666;
+            --border-color: #E5E5E5;
+            --button-bg: #F5F5F5;
+            --button-hover: #EEEEEE;
+            --input-bg: #FFFFFF;
+            --header-bg: #FFFFFF;
+            --modal-bg: #FFFFFF;
+            --divider-color: #E5E5E5;
+            --icon-color: #666666;
+            --accent-color: #5E5EFF;
+            --accent-hover: #4B4BFF;
+            --success-color: #4CAF50;
+            --primary-button: #0051FE;
+            --primary-button-hover: #0045DB;
+            --primary-text: #FFFFFF;
+        }
+
+        :root[data-theme="dark"] {
+            --background-color: #141414;
+            --surface-color: #1E1E1E;
+            --text-color: #FFFFFF;
+            --secondary-text: #8C8C8C;
+            --border-color: #2C2C2C;
+            --button-bg: #242424;
+            --button-hover: #2C2C2C;
+            --input-bg: #1E1E1E;
+            --header-bg: #141414;
+            --modal-bg: #141414;
+            --divider-color: #2C2C2C;
+            --icon-color: #8C8C8C;
+            --accent-color: #7B7BFF;
+            --accent-hover: #8E8EFF;
+            --success-color: #66BB6A;
+            --primary-button: #0051FE;
+            --primary-button-hover: #1A65FE;
+            --primary-text: #FFFFFF;
+        }
+
+        /* Remove the media query and add this for system preference */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme]) {
+                --background-color: #141414;
+                --surface-color: #1E1E1E;
+                --text-color: #FFFFFF;
+                --secondary-text: #8C8C8C;
+                --border-color: #2C2C2C;
+                --button-bg: #242424;
+                --button-hover: #2C2C2C;
+                --input-bg: #1E1E1E;
+                --header-bg: #141414;
+                --modal-bg: #141414;
+                --divider-color: #2C2C2C;
+                --icon-color: #8C8C8C;
+                --accent-color: #7B7BFF;
+                --accent-hover: #8E8EFF;
+                --success-color: #66BB6A;
+            }
         }
 
         /* Reset and base styles */
@@ -77,7 +128,7 @@
         }
 
         .textarea:focus {
-            border-color: #0062ff;
+            border-color: var(--accent-color);
             outline: none;
         }
 
@@ -90,7 +141,7 @@
 
         .action-btn {
             width: 100%;
-            padding: 12px;
+            padding: 12px 16px;
             border: none;
             border-radius: 8px;
             background-color: var(--button-bg);
@@ -100,7 +151,8 @@
             gap: 12px;
             cursor: pointer;
             font-size: 14px;
-            transition: background-color 0.2s;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
         .action-btn:hover {
@@ -115,7 +167,7 @@
         .action-btn svg {
             width: 16px;
             height: 16px;
-            flex-shrink: 0;
+            color: var(--icon-color);
         }
 
         .loading {
@@ -156,16 +208,28 @@
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 16px;
+            padding: 16px;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-header .back-button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
         }
 
         .modal-header h3 {
-            font-size: 1.25rem;
+            font-size: 16px;
             font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
         }
 
         .modal-body {
@@ -189,14 +253,28 @@
         }
 
         .setting-item {
-            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            margin-bottom: 8px;
+        }
+
+        .setting-item:hover {
+            background-color: var(--button-hover);
         }
 
         .setting-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .setting-item label svg {
+            width: 16px;
+            height: 16px;
+            color: var(--icon-color);
         }
 
         .setting-item select {
@@ -224,7 +302,7 @@
 
         .setting-item select:focus {
             outline: none;
-            border-color: #0062ff;
+            border-color: var(--accent-color);
         }
 
         .text-button {
@@ -257,7 +335,7 @@
         }
 
         .close-button:hover {
-            color: #0062ff;
+            color: var(--accent-color);
         }
 
         .close-button svg {
@@ -283,7 +361,7 @@
         }
 
         .btn-icon:hover {
-            color: #0062ff;
+            color: var(--accent-color);
         }
 
         .results-container {
@@ -405,10 +483,10 @@
         .save-confirmation {
             display: none;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             font-size: 12px;
-            color: #4CAF50;
-            margin-top: 4px;
+            color: var(--success-color);
+            margin-top: 8px;
         }
 
         .save-confirmation.visible {
@@ -416,7 +494,21 @@
         }
 
         .save-confirmation svg {
-            stroke: #4CAF50;
+            stroke: var(--success-color);
+        }
+
+        /* Add primary button styles */
+        .action-btn.primary {
+            background-color: var(--primary-button);
+            color: var(--primary-text);
+        }
+
+        .action-btn.primary:hover {
+            background-color: var(--primary-button-hover);
+        }
+
+        .action-btn.primary svg {
+            color: var(--primary-text);
         }
     </style>
 </head>
@@ -478,8 +570,10 @@
                     </div>
                 </div>
                 <div class="results-actions">
-                    <button id="applyToFigma" class="action-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <button id="applyToFigma" class="action-btn primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                         Apply to Figma
                     </button>
                 </div>
@@ -491,14 +585,12 @@
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="close-button" id="closeSettings">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                <button class="back-button" id="closeSettings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6"/>
                     </svg>
-                    Close
                 </button>
+                <h3>Settings & Preferences</h3>
             </div>
             <div class="modal-body">
                 <div class="settings-section">
@@ -537,6 +629,23 @@
                             <span>Changes saved</span>
                         </div>
                         <p class="setting-help">These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-section-title">Appearance</div>
+                    <div class="setting-item">
+                        <label for="themeSelect">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"/>
+                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                            </svg>
+                            Theme
+                        </label>
+                        <select id="themeSelect">
+                            <option value="system">System</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -625,6 +734,7 @@
             console.log('Requesting saved settings...');
             parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
             parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-theme' } }, '*');
         };
 
         // Update the message handler
@@ -655,6 +765,12 @@
                     console.log('Setting brand guidelines:', msg.guidelines);
                     if (msg.guidelines !== undefined) {
                         brandGuidelinesTextarea.value = msg.guidelines;
+                    }
+                    break;
+                case 'set-theme':
+                    if (msg.theme) {
+                        themeSelect.value = msg.theme;
+                        setTheme(msg.theme);
                     }
                     break;
             }
@@ -740,6 +856,40 @@
             processAndUpdateText('Enhance'));
         shortenButton.addEventListener('click', () => 
             processAndUpdateText('Shorten'));
+
+        // Add these to your existing variables
+        const themeSelect = document.getElementById('themeSelect');
+        
+        // Function to set theme
+        function setTheme(theme) {
+            if (theme === 'system') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            // Save theme preference
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'save-theme',
+                    theme: theme
+                }
+            }, '*');
+        }
+
+        // Theme selection handler
+        themeSelect.addEventListener('change', () => {
+            setTheme(themeSelect.value);
+        });
+
+        // Add back button handler
+        backToEditButton.addEventListener('click', () => {
+            // Hide results view
+            resultsView.style.display = 'none';
+            
+            // Show editor and action panel
+            textEditor.style.display = 'block';
+            document.querySelector('.action-panel').style.display = 'flex';
+        });
     </script>
 </body>
 </html>

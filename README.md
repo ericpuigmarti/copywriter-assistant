@@ -1,7 +1,7 @@
-# Copywriting Assistant
+# CopyMate - Smarter, Faster, Better Copywriting Assistant
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/version-0.1.6-blue)
+![Version](https://img.shields.io/badge/version-0.2.4-blue)
 
 A Figma plugin that helps you enhance, translate, and optimize your UX copy directly within Figma.
 
@@ -13,7 +13,9 @@ A Figma plugin that helps you enhance, translate, and optimize your UX copy dire
 - **Batch Processing**: Select and process multiple text layers simultaneously
 - **Brand Guidelines**: Input your brand guidelines to maintain consistent voice and style
 - **Settings Persistence**: Saves your language and brand guidelines preferences
-- **Local Backend**: Flask server for secure API handling
+- **Real-time Feedback**: Visual confirmation when settings are saved
+- **Theme Support**: Choose between light, dark, or system theme
+- **Modern UI**: Clean, intuitive interface with improved visual hierarchy
 
 ## Brand Voice Management
 
@@ -23,6 +25,7 @@ The plugin now includes robust brand voice management:
 - Maintains consistent brand voice across translations
 - Preserves tone and style in shortened text
 - Enhances text while adhering to brand standards
+- Real-time save confirmation for guidelines changes
 
 ## How It Works
 

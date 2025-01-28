@@ -204,4 +204,51 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 ### Technical
 - Added save confirmation component
 - Implemented auto-hiding confirmation message
-- Enhanced UI feedback system 
+- Enhanced UI feedback system
+
+## [0.2.1] - 2024-01-24
+
+### Added
+- Dark mode support with system preference detection
+- Modern, cleaner UI styling
+- Enhanced visual hierarchy
+
+### Changed
+- Updated button and input styles
+- Improved settings modal layout
+- Enhanced color system with new variables
+- Refined spacing and typography
+
+### Technical
+- Added CSS variables for theme support
+- Implemented prefers-color-scheme media query
+- Enhanced component styling structure
+
+## [0.2.2] - 2024-01-24
+
+### Added
+- Theme toggle in settings (Light/Dark/System)
+- Theme persistence across sessions
+- System theme detection
+
+### Changed
+- Updated theme implementation to support manual selection
+- Improved theme switching UX
+- Enhanced theme persistence logic
+
+### Technical
+- Added theme selection UI
+- Implemented theme storage in client preferences
+- Enhanced theme switching mechanism
+
+## [0.2.3] - 2024-01-24
+
+### Changed
+- Enhanced "Apply to Figma" button visibility
+- Added primary button styling
+- Improved action hierarchy
+
+### Technical
+- Added primary button color variables
+- Enhanced button state management
+- Updated button contrast for better accessibility
