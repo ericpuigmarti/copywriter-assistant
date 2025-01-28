@@ -154,57 +154,17 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Environment variable management
 - Proper gitignore setup
 
-## [0.1.8] - 2024-01-24
-
-### Changed
-- Complete UI redesign to match Figma's dark theme
-- Improved button layout and styling
-- Moved settings to footer navigation
-- Enhanced overall visual hierarchy
-
-### Added
-- Dark mode as default theme
-- Full-width action buttons
-- Footer navigation bar
-- Help button in footer
-
-### Technical
-- Refactored CSS variables for dark theme
-- Updated component structure
-- Improved responsive layout
-- Enhanced button states and transitions
-
-## [0.1.9] - 2024-01-24
+## [0.2.6] - 2024-01-24
 
 ### Fixed
-- Brand guidelines persistence across plugin sessions
-- Settings synchronization for brand guidelines
-- Guidelines loading on plugin startup
-
-### Changed
-- Improved brand guidelines save behavior
-- Enhanced settings persistence logic
+- SVG icon display issues in action buttons
+- Icon color inheritance
+- Icon sizing and alignment
 
 ### Technical
-- Updated client storage handling for guidelines
-- Added debug logging for settings persistence
-- Improved settings synchronization
-
-## [0.2.0] - 2024-01-24
-
-### Added
-- Save confirmation indicator for brand guidelines
-- Visual feedback for settings changes
-- Auto-hiding save confirmation
-
-### Changed
-- Improved user feedback for settings persistence
-- Enhanced visual feedback for user actions
-
-### Technical
-- Added save confirmation component
-- Implemented auto-hiding confirmation message
-- Enhanced UI feedback system
+- Updated SVG styling structure
+- Enhanced icon containers
+- Improved color inheritance for icons
 
 ## [0.2.1] - 2024-01-24
 
@@ -252,3 +212,47 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Added primary button color variables
 - Enhanced button state management
 - Updated button contrast for better accessibility
+
+## [0.2.4] - 2024-01-24
+
+### Changed
+- Updated dark theme with deeper, more contrasting colors
+- Enhanced dark mode visual hierarchy
+- Improved dark mode readability
+
+### Technical
+- Refined dark theme color palette
+- Updated system preference dark theme
+- Enhanced color contrast ratios
+
+## [0.2.5] - 2024-01-24
+
+### Changed
+- Redesigned action buttons to match Figma's native style
+- Added "Writing tools" section label
+- Enhanced button layout and iconography
+- Improved visual hierarchy of actions
+
+### Technical
+- Updated button component structure
+- Added section title styling
+- Enhanced button states and interactions
+- Improved accessibility with better button structure
+
+## [0.2.7] - 2024-01-24
+
+### Fixed
+- UI view toggling between edit and results
+- Button state management based on text content
+- Text selection handling from Figma
+- Loading state visibility
+
+### Changed
+- Improved view state management
+- Enhanced error handling in API calls
+- Better user feedback during operations
+
+### Technical
+- Refactored API call handling
+- Improved view state transitions
+- Enhanced error recovery

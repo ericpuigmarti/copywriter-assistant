@@ -1,7 +1,7 @@
 # CopyMate - Smarter, Faster, Better Copywriting Assistant
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/version-0.2.4-blue)
+![Version](https://img.shields.io/badge/version-0.2.7-blue)
 
 A Figma plugin that helps you enhance, translate, and optimize your UX copy directly within Figma.
 

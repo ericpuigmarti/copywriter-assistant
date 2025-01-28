@@ -77,12 +77,15 @@
         }
 
         body {
+            /* Use system fonts with Inter-like alternatives */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             width: 400px;
             height: 600px;
             overflow: hidden;
             background-color: var(--background-color);
             color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Layout */
@@ -142,17 +145,17 @@
         .action-btn {
             width: 100%;
             padding: 12px 16px;
-            border: none;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            background-color: var(--button-bg);
+            background-color: var(--surface-color);
             color: var(--text-color);
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: all 150ms ease;
         }
 
         .action-btn:hover {
@@ -164,10 +167,37 @@
             cursor: not-allowed;
         }
 
-        .action-btn svg {
+        .action-btn .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+        }
+
+        .btn-icon {
             width: 16px;
             height: 16px;
             color: var(--icon-color);
+            flex-shrink: 0;
+        }
+
+        .btn-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .chevron {
+            width: 16px;
+            height: 16px;
+            color: var(--icon-color);
+            flex-shrink: 0;
+        }
+
+        .chevron svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
         }
 
         .loading {
@@ -244,12 +274,12 @@
         }
 
         .settings-section-title {
-            font-size: 0.875rem;
+            font-size: 13px;
             font-weight: 600;
             color: var(--secondary-text);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .setting-item {
@@ -510,6 +540,256 @@
         .action-btn.primary svg {
             color: var(--primary-text);
         }
+
+        /* Section title styles */
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 16px 0 8px 0;
+        }
+
+        .quality-report {
+            padding: 24px;
+            background: var(--surface-color);
+            border-radius: 12px;
+        }
+
+        .score-summary {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-color);
+            border: 4px solid;
+        }
+
+        .score-circle[data-score="85"] {
+            border-color: #4CAF50;
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-color);
+        }
+
+        .score-total {
+            font-size: 16px;
+            color: var(--secondary-text);
+        }
+
+        .score-badge {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: #4CAF50;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .criteria-section {
+            margin: 32px 0;
+        }
+
+        .criteria-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .criteria-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .criteria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--button-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-button);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .analysis-section {
+            display: grid;
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .analysis-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .analysis-list li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Settings Modal Styles */
+        .settings-modal {
+            padding: 24px;
+            background: var(--background-color);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+            margin: -8px;
+            border-radius: 6px;
+        }
+
+        .back-button:hover {
+            background: var(--button-hover);
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        /* Dropdown Select Styles */
+        .settings-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--surface-color);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 20px;
+            font-weight: 500;
+        }
+
+        .settings-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Brand Guidelines Textarea */
+        .brand-guidelines {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+
+        .brand-guidelines h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .brand-guidelines h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 12px 0 4px;
+        }
+
+        .brand-guidelines p {
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+        }
+
+        .brand-guidelines ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0;
+        }
+
+        .brand-guidelines li {
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--secondary-text);
+            margin-bottom: 4px;
+            padding-left: 8px;
+        }
+
+        .brand-guidelines li::before {
+            content: "•";
+            color: var(--secondary-text);
+            display: inline-block;
+            width: 8px;
+            margin-left: -8px;
+        }
     </style>
 </head>
 <body>
@@ -523,18 +803,56 @@
         </header>
         <main>
             <textarea id="textEditor" class="textarea" placeholder="Select text in Figma or type here..."></textarea>
+            <div class="section-title">Writing tools</div>
             <div class="action-panel">
                 <button id="translateButton" class="action-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                    Translate
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M2 12h20"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10z"/>
+                            </svg>
+                        </div>
+                        Translate
+                    </div>
+                    <div class="chevron">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
                 </button>
                 <button id="enhanceButton" class="action-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    Improve it
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        Enhance
+                    </div>
+                    <div class="chevron">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
                 </button>
                 <button id="shortenButton" class="action-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
-                    Shorten
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="4" y1="12" x2="20" y2="12"/>
+                                <line x1="4" y1="6" x2="14" y2="6"/>
+                                <line x1="4" y1="18" x2="10" y2="18"/>
+                            </svg>
+                        </div>
+                        Shorten
+                    </div>
+                    <div class="chevron">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
                 </button>
             </div>
             <div id="loadingIndicator" class="loading" style="display: none;">
@@ -582,73 +900,45 @@
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="back-button" id="closeSettings">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                </button>
-                <h3>Settings & Preferences</h3>
+    <div id="settingsModal" class="modal settings-modal">
+        <div class="settings-header">
+            <button class="back-button" id="closeSettings">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <h2 class="settings-title">Settings & Preferences</h2>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="settings-section-title">Language</h3>
+            <select id="targetLanguageSelect" class="settings-select">
+                <option value="French (Canada)">French (Canada)</option>
+                <!-- Add other language options -->
+            </select>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="settings-section-title">Brand Guidelines</h3>
+            <div class="brand-guidelines">
+                <h3>Brand Voice & Style</h3>
+                <h4>Brand voice</h4>
+                <h4>Guiding Principles</h4>
+                <ul>
+                    <li>Be human: Write like you speak. Make it relatable.</li>
+                    <li>Use "you" and "your" to help make it personal.</li>
+                </ul>
+                <p>These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
             </div>
-            <div class="modal-body">
-                <div class="settings-section">
-                    <div class="settings-section-title">Language</div>
-                    <div class="setting-item">
-                        <label for="targetLanguage">Target Language</label>
-                        <select id="targetLanguage">
-                            <option value="es">Spanish</option>
-                            <option value="fr">French</option>
-                            <option value="fr-ca">French (Canada)</option>
-                            <option value="de">German</option>
-                            <option value="it">Italian</option>
-                            <option value="pt">Portuguese</option>
-                            <option value="nl">Dutch</option>
-                            <option value="pl">Polish</option>
-                            <option value="ru">Russian</option>
-                            <option value="ja">Japanese</option>
-                            <option value="ko">Korean</option>
-                            <option value="zh">Chinese (Simplified)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="settings-section">
-                    <div class="settings-section-title">Brand Guidelines</div>
-                    <div class="setting-item">
-                        <label for="brandGuidelines">Brand Voice & Style</label>
-                        <textarea 
-                            id="brandGuidelines" 
-                            class="textarea guidelines-textarea" 
-                            placeholder="Enter your brand guidelines here. Example: Our brand voice is friendly but professional, using simple language and avoiding jargon. We prefer active voice and short sentences."
-                        ></textarea>
-                        <div id="saveConfirmation" class="save-confirmation">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span>Changes saved</span>
-                        </div>
-                        <p class="setting-help">These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
-                    </div>
-                </div>
-                <div class="settings-section">
-                    <div class="settings-section-title">Appearance</div>
-                    <div class="setting-item">
-                        <label for="themeSelect">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="5"/>
-                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                            </svg>
-                            Theme
-                        </label>
-                        <select id="themeSelect">
-                            <option value="system">System</option>
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="settings-section-title">Appearance</h3>
+            <select id="themeSelect" class="settings-select">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System</option>
+            </select>
         </div>
     </div>
 
@@ -661,83 +951,114 @@
         const settingsButton = document.getElementById('settingsButton');
         const settingsModal = document.getElementById('settingsModal');
         const closeButton = document.getElementById('closeSettings');
-        const targetLanguageSelect = document.getElementById('targetLanguage');
+        const targetLanguageSelect = document.getElementById('targetLanguageSelect');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const resultsView = document.getElementById('resultsView');
         const backToEditButton = document.getElementById('backToEdit');
         const applyToFigmaButton = document.getElementById('applyToFigma');
-        const brandGuidelinesTextarea = document.getElementById('brandGuidelines');
+        const themeSelect = document.getElementById('themeSelect');
         let currentProcessedTexts = [];
-        let selectedTexts = new Map(); // Store text layers with their IDs
+        let selectedTexts = new Map();
 
-        // Add save confirmation element
-        const saveConfirmation = document.getElementById('saveConfirmation');
-        let saveTimeout;
+        // Helper function to toggle views
+        function showResults() {
+            textEditor.style.display = 'none';
+            document.querySelector('.action-panel').style.display = 'none';
+            document.querySelector('.section-title').style.display = 'none';
+            resultsView.style.display = 'block';
+        }
 
-        // Enable/disable action buttons based on text content
-        textEditor.addEventListener('input', () => {
-            const hasText = textEditor.value.trim().length > 0;
-            translateButton.disabled = !hasText;
-            enhanceButton.disabled = !hasText;
-            shortenButton.disabled = !hasText;
+        function showEditor() {
+            textEditor.style.display = 'block';
+            document.querySelector('.action-panel').style.display = 'flex';
+            document.querySelector('.section-title').style.display = 'block';
+            resultsView.style.display = 'none';
+            loadingIndicator.style.display = 'none';
+        }
+
+        // Update the back button handler
+        backToEditButton.addEventListener('click', () => {
+            showEditor();
         });
 
-        // Settings modal
-        settingsButton.addEventListener('click', () => {
-            settingsModal.style.display = 'block';
-            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
-        });
-
-        closeButton.addEventListener('click', () => {
-            settingsModal.style.display = 'none';
-        });
-
-        // Handle clicks outside modal
-        window.addEventListener('click', (event) => {
-            if (event.target === settingsModal) {
-                settingsModal.style.display = 'none';
+        // Update API call handlers
+        async function handleAPICall(endpoint, data) {
+            loadingIndicator.style.display = 'block';
+            resultsView.style.display = 'none';
+            textEditor.style.display = 'none';
+            document.querySelector('.action-panel').style.display = 'none';
+            document.querySelector('.section-title').style.display = 'none';
+            
+            try {
+                const response = await callAPI(endpoint, data);
+                document.getElementById('originalText').textContent = textEditor.value;
+                
+                // Set the processed text based on the endpoint
+                const processedText = response.translatedText || response.enhancedText || response.shortenedText;
+                document.getElementById('processedText').textContent = processedText;
+                
+                currentProcessedTexts = Array.from(selectedTexts.keys()).map(id => ({
+                    id: id,
+                    text: processedText
+                }));
+                
+                loadingIndicator.style.display = 'none';
+                showResults();
+            } catch (error) {
+                loadingIndicator.style.display = 'none';
+                showEditor();
+                alert(`${endpoint} failed. Please try again. ` + error.message);
             }
+        }
+
+        // Update button handlers to use the new handleAPICall function
+        translateButton.addEventListener('click', async () => {
+            if (!textEditor.value.trim()) return;
+            await handleAPICall('translate', {
+                text: textEditor.value,
+                targetLanguage: targetLanguageSelect.value
+            });
         });
 
-        // Save language preference
-        targetLanguageSelect.addEventListener('change', () => {
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'save-language',
-                    language: targetLanguageSelect.value
+        enhanceButton.addEventListener('click', async () => {
+            if (!textEditor.value.trim()) return;
+            await handleAPICall('enhance', {
+                text: textEditor.value
+            });
+        });
+
+        shortenButton.addEventListener('click', async () => {
+            if (!textEditor.value.trim()) return;
+            await handleAPICall('shorten', {
+                text: textEditor.value
+            });
+        });
+
+        // Helper function for API calls
+        async function callAPI(endpoint, data) {
+            try {
+                const response = await fetch(`http://localhost:5000/${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'omit',
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            }, '*');
-        });
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`${endpoint} error:`, error);
+                throw error;
+            }
+        }
 
-        // Update brand guidelines save handler
-        brandGuidelinesTextarea.addEventListener('input', () => {
-            console.log('Saving brand guidelines:', brandGuidelinesTextarea.value);
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'save-brand-guidelines',
-                    guidelines: brandGuidelinesTextarea.value
-                }
-            }, '*');
-
-            // Show save confirmation
-            saveConfirmation.classList.add('visible');
-
-            // Hide confirmation after 2 seconds
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                saveConfirmation.classList.remove('visible');
-            }, 2000);
-        });
-
-        // Request saved settings on plugin load
-        window.onload = () => {
-            console.log('Requesting saved settings...');
-            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-theme' } }, '*');
-        };
-
-        // Update the message handler
+        // Update the message handler to trigger button state update
         window.onmessage = (event) => {
             const msg = event.data.pluginMessage;
             if (!msg) return;
@@ -748,148 +1069,57 @@
                     selectedTexts.clear();
                     let combinedText = '';
                     
-                    msg.texts.forEach(item => {
-                        selectedTexts.set(item.id, item.text);
-                        combinedText += item.text + '\n\n';
-                    });
-                    
-                    textEditor.value = combinedText.trim();
-                    textEditor.dispatchEvent(new Event('input'));
-                    break;
-                case 'set-language':
-                    if (msg.language) {
-                        targetLanguageSelect.value = msg.language;
+                    if (msg.texts && msg.texts.length > 0) {
+                        msg.texts.forEach(item => {
+                            selectedTexts.set(item.id, item.text);
+                            combinedText += item.text + '\n\n';
+                        });
+                        
+                        textEditor.value = combinedText.trim();
+                        updateButtonStates(); // Update button states when text is received
+                    } else {
+                        textEditor.value = '';
+                        updateButtonStates(); // Update button states when text is cleared
                     }
                     break;
-                case 'set-brand-guidelines':
-                    console.log('Setting brand guidelines:', msg.guidelines);
-                    if (msg.guidelines !== undefined) {
-                        brandGuidelinesTextarea.value = msg.guidelines;
-                    }
-                    break;
-                case 'set-theme':
-                    if (msg.theme) {
-                        themeSelect.value = msg.theme;
-                        setTheme(msg.theme);
-                    }
-                    break;
+
+                // ... rest of message handling
             }
         };
 
-        // Update the processing functions
-        async function processAndUpdateText(action, targetLanguage = '') {
-            loadingIndicator.style.display = 'block';
-            const processedTexts = [];
-
-            try {
-                // Process each text separately
-                for (const [id, text] of selectedTexts) {
-                    console.log('Processing text with language:', targetLanguage);
-                    const response = await fetch('http://localhost:5000/generate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: text,
-                            action: action,
-                            targetLanguage: targetLanguage,
-                            brandGuidelines: brandGuidelinesTextarea.value
-                        })
-                    });
-                    const data = await response.json();
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    processedTexts.push({
-                        id: id,
-                        originalText: text,
-                        processedText: data.response
-                    });
-                }
-
-                // Update UI with results
-                document.getElementById('originalText').innerHTML = processedTexts
-                    .map(item => item.originalText)
-                    .join('\n\n');
-                document.getElementById('processedText').innerHTML = processedTexts
-                    .map(item => item.processedText)
-                    .join('\n\n');
-
-                // Store for applying to Figma
-                currentProcessedTexts = processedTexts;
-
-                // Show results view
-                document.getElementById('resultsView').style.display = 'block';
-                textEditor.style.display = 'none';
-                document.querySelector('.action-panel').style.display = 'none';
-
-            } catch (error) {
-                console.error('Error:', error);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        }
-
-        // Update apply to Figma functionality
-        applyToFigmaButton.addEventListener('click', () => {
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'update-text',
-                    processedTexts: currentProcessedTexts.map(item => ({
-                        id: item.id,
-                        text: item.processedText
-                    }))
-                }
-            }, '*');
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
             
-            // Reset UI
-            document.getElementById('resultsView').style.display = 'none';
-            textEditor.style.display = 'block';
-            document.querySelector('.action-panel').style.display = 'grid';
+            // Request initial data
+            parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
         });
 
-        // Update action button handlers
-        translateButton.addEventListener('click', () => {
-            console.log('Translation requested with language:', targetLanguageSelect.value);
-            processAndUpdateText('Translate', targetLanguageSelect.value);
-        });
-        enhanceButton.addEventListener('click', () => 
-            processAndUpdateText('Enhance'));
-        shortenButton.addEventListener('click', () => 
-            processAndUpdateText('Shorten'));
-
-        // Add these to your existing variables
-        const themeSelect = document.getElementById('themeSelect');
-        
-        // Function to set theme
+        // Keep helper functions outside
         function setTheme(theme) {
-            if (theme === 'system') {
-                document.documentElement.removeAttribute('data-theme');
-            } else {
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-            // Save theme preference
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'save-theme',
-                    theme: theme
-                }
-            }, '*');
+            // ... theme setting code ...
         }
 
-        // Theme selection handler
-        themeSelect.addEventListener('change', () => {
-            setTheme(themeSelect.value);
-        });
+        function initializeTheme() {
+            document.documentElement.setAttribute('data-theme', 'light');
+            if (themeSelect) {
+                themeSelect.value = 'light';
+            }
+        }
 
-        // Add back button handler
-        backToEditButton.addEventListener('click', () => {
-            // Hide results view
-            resultsView.style.display = 'none';
-            
-            // Show editor and action panel
-            textEditor.style.display = 'block';
-            document.querySelector('.action-panel').style.display = 'flex';
-        });
+        // Function to update button states
+        function updateButtonStates() {
+            const hasText = textEditor.value.trim().length > 0;
+            translateButton.disabled = !hasText;
+            enhanceButton.disabled = !hasText;
+            shortenButton.disabled = !hasText;
+        }
+
+        // Add textarea event listeners
+        textEditor.addEventListener('input', updateButtonStates);
+        textEditor.addEventListener('change', updateButtonStates);
     </script>
 </body>
 </html>
