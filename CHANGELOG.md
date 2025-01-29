@@ -3,8 +3,122 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
-## [0.1.7] - 2024-01-24
+## [Unreleased]
+### Changed
+- Removed background from language and appearance dropdowns
+- Removed background from brand guidelines textarea
+- Updated settings button visibility to only show in text editor view
+- Improved apply-to-figma functionality with better error handling
 
+### Fixed
+- Fixed text application to Figma layers using getNodeByIdAsync
+- Fixed memory access issues with node handling
+- Fixed settings button blocking content in other views
+- Fixed background styling consistency in dark mode
+
+### Technical
+- Updated node retrieval to use figma.getNodeByIdAsync for dynamic-page access
+- Improved async operations handling in text application
+- Enhanced error boundaries in text processing
+- Optimized settings button visibility management
+
+## [0.2.7] - 2024-01-24
+### Fixed
+- UI view toggling between edit and results
+- Button state management based on text content
+- Text selection handling from Figma
+- Loading state visibility
+
+### Changed
+- Improved view state management
+- Enhanced error handling in API calls
+- Better user feedback during operations
+
+### Technical
+- Refactored API call handling
+- Improved view state transitions
+- Enhanced error recovery
+
+## [0.2.6] - 2024-01-24
+### Fixed
+- SVG icon display issues in action buttons
+- Icon color inheritance
+- Icon sizing and alignment
+
+### Technical
+- Updated SVG styling structure
+- Enhanced icon containers
+- Improved color inheritance for icons
+
+## [0.2.5] - 2024-01-24
+### Changed
+- Redesigned action buttons to match Figma's native style
+- Added "Writing tools" section label
+- Enhanced button layout and iconography
+- Improved visual hierarchy of actions
+
+### Technical
+- Updated button component structure
+- Added section title styling
+- Enhanced button states and interactions
+- Improved accessibility with better button structure
+
+## [0.2.4] - 2024-01-24
+### Changed
+- Updated dark theme with deeper, more contrasting colors
+- Enhanced dark mode visual hierarchy
+- Improved dark mode readability
+
+### Technical
+- Refined dark theme color palette
+- Updated system preference dark theme
+- Enhanced color contrast ratios
+
+## [0.2.3] - 2024-01-24
+### Changed
+- Enhanced "Apply to Figma" button visibility
+- Added primary button styling
+- Improved action hierarchy
+
+### Technical
+- Added primary button color variables
+- Enhanced button state management
+- Updated button contrast for better accessibility
+
+## [0.2.2] - 2024-01-24
+### Added
+- Theme toggle in settings (Light/Dark/System)
+- Theme persistence across sessions
+- System theme detection
+
+### Changed
+- Updated theme implementation to support manual selection
+- Improved theme switching UX
+- Enhanced theme persistence logic
+
+### Technical
+- Added theme selection UI
+- Implemented theme storage in client preferences
+- Enhanced theme switching mechanism
+
+## [0.2.1] - 2024-01-24
+### Added
+- Dark mode support with system preference detection
+- Modern, cleaner UI styling
+- Enhanced visual hierarchy
+
+### Changed
+- Updated button and input styles
+- Improved settings modal layout
+- Enhanced color system with new variables
+- Refined spacing and typography
+
+### Technical
+- Added CSS variables for theme support
+- Implemented prefers-color-scheme media query
+- Enhanced component styling structure
+
+## [0.1.7] - 2024-01-24
 ### Changed
 - Improved results view layout with vertical stacking
 - Enhanced readability of original vs processed text
@@ -17,7 +131,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Improved responsive behavior
 
 ## [0.1.6] - 2024-01-24
-
 ### Added
 - Configuration management system
 - Environment-specific settings
@@ -37,7 +150,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Enhanced environment handling
 
 ## [0.1.5] - 2024-01-24
-
 ### Fixed
 - Language settings not being properly loaded on plugin start
 - Incorrect language being applied in translations
@@ -54,7 +166,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Added debug logging for language settings
 
 ## [0.1.4] - 2024-01-24
-
 ### Fixed
 - Translation language not being properly applied
 - Language persistence in settings
@@ -71,7 +182,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Strengthened translation prompt structure
 
 ## [0.1.3] - 2024-01-24
-
 ### Added
 - Individual text processing for multiple selections
 - Mapping system for text layer tracking
@@ -88,7 +198,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Multiple selection handling in the UI
 
 ## [0.1.2] - 2024-01-24
-
 ### Added
 - Brand guidelines input in settings modal
 - Persistent storage for brand guidelines across sessions
@@ -109,7 +218,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Improved prompt engineering for brand voice consistency
 
 ## [0.1.1] - 2024-01-24
-
 ### Added
 - Better error handling in server.py
 - Detailed logging for debugging
@@ -128,7 +236,6 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - UI responsiveness during text processing
 
 ## [0.1.0] - 2024-01-24
-
 ### Added
 - Initial plugin implementation
 - Basic text processing features:
@@ -153,106 +260,3 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - CORS configuration for local development
 - Environment variable management
 - Proper gitignore setup
-
-## [0.2.6] - 2024-01-24
-
-### Fixed
-- SVG icon display issues in action buttons
-- Icon color inheritance
-- Icon sizing and alignment
-
-### Technical
-- Updated SVG styling structure
-- Enhanced icon containers
-- Improved color inheritance for icons
-
-## [0.2.1] - 2024-01-24
-
-### Added
-- Dark mode support with system preference detection
-- Modern, cleaner UI styling
-- Enhanced visual hierarchy
-
-### Changed
-- Updated button and input styles
-- Improved settings modal layout
-- Enhanced color system with new variables
-- Refined spacing and typography
-
-### Technical
-- Added CSS variables for theme support
-- Implemented prefers-color-scheme media query
-- Enhanced component styling structure
-
-## [0.2.2] - 2024-01-24
-
-### Added
-- Theme toggle in settings (Light/Dark/System)
-- Theme persistence across sessions
-- System theme detection
-
-### Changed
-- Updated theme implementation to support manual selection
-- Improved theme switching UX
-- Enhanced theme persistence logic
-
-### Technical
-- Added theme selection UI
-- Implemented theme storage in client preferences
-- Enhanced theme switching mechanism
-
-## [0.2.3] - 2024-01-24
-
-### Changed
-- Enhanced "Apply to Figma" button visibility
-- Added primary button styling
-- Improved action hierarchy
-
-### Technical
-- Added primary button color variables
-- Enhanced button state management
-- Updated button contrast for better accessibility
-
-## [0.2.4] - 2024-01-24
-
-### Changed
-- Updated dark theme with deeper, more contrasting colors
-- Enhanced dark mode visual hierarchy
-- Improved dark mode readability
-
-### Technical
-- Refined dark theme color palette
-- Updated system preference dark theme
-- Enhanced color contrast ratios
-
-## [0.2.5] - 2024-01-24
-
-### Changed
-- Redesigned action buttons to match Figma's native style
-- Added "Writing tools" section label
-- Enhanced button layout and iconography
-- Improved visual hierarchy of actions
-
-### Technical
-- Updated button component structure
-- Added section title styling
-- Enhanced button states and interactions
-- Improved accessibility with better button structure
-
-## [0.2.7] - 2024-01-24
-
-### Fixed
-- UI view toggling between edit and results
-- Button state management based on text content
-- Text selection handling from Figma
-- Loading state visibility
-
-### Changed
-- Improved view state management
-- Enhanced error handling in API calls
-- Better user feedback during operations
-
-### Technical
-- Refactored API call handling
-- Improved view state transitions
-- Enhanced error recovery

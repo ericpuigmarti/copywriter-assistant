@@ -25,6 +25,7 @@
             --primary-button: #0051FE;
             --primary-button-hover: #0045DB;
             --primary-text: #FFFFFF;
+            --border-subtle: #e4e4e7;
         }
 
         :root[data-theme="dark"] {
@@ -46,6 +47,7 @@
             --primary-button: #0051FE;
             --primary-button-hover: #1A65FE;
             --primary-text: #FFFFFF;
+            --border-subtle: #27272a;
         }
 
         /* Remove the media query and add this for system preference */
@@ -120,9 +122,9 @@
         .textarea {
             width: 100%;
             height: 8rem;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
             resize: none;
             font-family: inherit;
             font-size: 0.875rem;
@@ -131,8 +133,8 @@
         }
 
         .textarea:focus {
-            border-color: var(--accent-color);
             outline: none;
+            border-color: var(--accent-color);
         }
 
         .action-panel {
@@ -142,62 +144,91 @@
             margin-top: 16px;
         }
 
+        /* Update button styles */
         .action-btn {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid var(--border-color);
+            border: none; /* Remove border */
             border-radius: 8px;
-            background-color: var(--surface-color);
-            color: var(--text-color);
+            background-color: transparent;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 150ms ease;
+            transition: all 200ms ease;
+            outline: none;
         }
 
-        .action-btn:hover {
-            background-color: var(--button-hover);
+        .action-btn:focus {
+            outline: none;
         }
 
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .action-btn:focus-visible {
+            outline: none;
         }
 
-        .action-btn .btn-content {
+        .btn-content {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--text-color);
+            gap: 12px;
+            text-align: left;
+            border: none; /* Ensure no border */
+        }
+
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border: none; /* Ensure no border */
+        }
+
+        .btn-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0E0D10;
+        }
+
+        .btn-description {
+            font-size: 12px;
+            color: #71717A;
         }
 
         .btn-icon {
             width: 16px;
             height: 16px;
-            color: var(--icon-color);
+            color: #71717A;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none; /* Remove any potential border from icon containers */
         }
 
         .btn-icon svg {
-            width: 100%;
-            height: 100%;
+            width: 16px !important;
+            height: 16px !important;
             stroke: currentColor;
+            stroke-width: 1.5;
+            flex-shrink: 0;
         }
 
         .chevron {
             width: 16px;
             height: 16px;
-            color: var(--icon-color);
+            color: #71717A;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none; /* Remove any potential border from icon containers */
         }
 
         .chevron svg {
-            width: 100%;
-            height: 100%;
+            width: 16px !important;
+            height: 16px !important;
             stroke: currentColor;
+            stroke-width: 1.5;
+            flex-shrink: 0;
         }
 
         .loading {
@@ -226,6 +257,10 @@
             height: 100%;
             background-color: var(--modal-bg);
             z-index: 1000;
+        }
+
+        .modal.visible {
+            display: block;
         }
 
         .modal-content {
@@ -309,9 +344,9 @@
 
         .setting-item select {
             width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid #71717A;
+            border-radius: 8px;
             background-color: var(--button-bg);
             color: var(--text-color);
             font-size: 14px;
@@ -321,9 +356,9 @@
             -webkit-appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 8px center;
+            background-position: right 16px center;
             background-size: 16px;
-            padding-right: 32px;
+            padding-right: 48px;
         }
 
         .setting-item select:hover {
@@ -346,6 +381,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
         }
 
         .text-button:hover {
@@ -462,7 +498,6 @@
             display: flex;
             justify-content: flex-end;
             padding: 16px 0 0;
-            border-top: 1px solid var(--border-color);
             margin-top: 16px;
         }
 
@@ -513,10 +548,10 @@
         .save-confirmation {
             display: none;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: var(--success-color);
+            gap: 8px;
             margin-top: 8px;
+            color: #10B981; /* Success green */
+            font-size: 14px;
         }
 
         .save-confirmation.visible {
@@ -524,21 +559,33 @@
         }
 
         .save-confirmation svg {
-            stroke: var(--success-color);
+            stroke: #10B981;
         }
 
-        /* Add primary button styles */
+        /* Update primary button styles */
         .action-btn.primary {
-            background-color: var(--primary-button);
-            color: var(--primary-text);
+            background-color: #3B82F6;  /* Updated blue color */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: auto;  /* Override full width */
+            transition: background-color 200ms ease;
         }
 
         .action-btn.primary:hover {
-            background-color: var(--primary-button-hover);
+            background-color: #2563EB;  /* Darker blue on hover */
         }
 
         .action-btn.primary svg {
-            color: var(--primary-text);
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
         }
 
         /* Section title styles */
@@ -720,23 +767,66 @@
             margin-bottom: 12px;
         }
 
-        /* Dropdown Select Styles */
+        /* Update Dropdown Select Styles */
         .settings-select {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
             border-radius: 8px;
-            background: var(--surface-color);
+            background: transparent; /* Remove background */
             color: var(--text-color);
             font-family: inherit;
             font-size: 14px;
             line-height: 20px;
             font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 48px;
+        }
+
+        .settings-select:hover {
+            background-color: var(--button-hover);
         }
 
         .settings-select:focus {
             outline: none;
             border-color: var(--accent-color);
+        }
+
+        /* Remove background from select options */
+        .settings-select option {
+            background-color: var(--surface-color);
+            color: var(--text-color);
+        }
+
+        /* Update Brand Guidelines Textarea */
+        .settings-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background: transparent;  /* Remove background */
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .settings-textarea:hover {
+            background-color: var(--button-hover);
+        }
+
+        .settings-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: transparent;  /* Keep transparent on focus */
         }
 
         /* Brand Guidelines Textarea */
@@ -790,17 +880,29 @@
             width: 8px;
             margin-left: -8px;
         }
+
+        /* Add hover effect without border */
+        .action-btn:hover {
+            background-color: #F4F4F5;
+        }
+
+        /* Update settings button container styles */
+        .settings-button-container {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            z-index: 100;
+            transition: opacity 200ms ease;
+        }
+
+        .settings-button-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <!-- <h1>Copywriter Assistant</h1> -->
-            <button id="settingsButton" class="text-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                Settings
-            </button>
-        </header>
         <main>
             <textarea id="textEditor" class="textarea" placeholder="Select text in Figma or type here..."></textarea>
             <div class="section-title">Writing tools</div>
@@ -808,13 +910,16 @@
                 <button id="translateButton" class="action-btn" disabled>
                     <div class="btn-content">
                         <div class="btn-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M2 12h20"/>
-                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                             </svg>
                         </div>
-                        Translate
+                        <div class="btn-text">
+                            <div class="btn-title">Translate</div>
+                            <div class="btn-description">Convert text to different languages</div>
+                        </div>
                     </div>
                     <div class="chevron">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -825,11 +930,14 @@
                 <button id="enhanceButton" class="action-btn" disabled>
                     <div class="btn-content">
                         <div class="btn-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                             </svg>
                         </div>
-                        Enhance
+                        <div class="btn-text">
+                            <div class="btn-title">Enhance</div>
+                            <div class="btn-description">Improve writing quality and clarity</div>
+                        </div>
                     </div>
                     <div class="chevron">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -840,13 +948,18 @@
                 <button id="shortenButton" class="action-btn" disabled>
                     <div class="btn-content">
                         <div class="btn-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="4" y1="12" x2="20" y2="12"/>
-                                <line x1="4" y1="6" x2="14" y2="6"/>
-                                <line x1="4" y1="18" x2="10" y2="18"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="6" cy="6" r="3"></circle>
+                                <circle cx="6" cy="18" r="3"></circle>
+                                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
                             </svg>
                         </div>
-                        Shorten
+                        <div class="btn-text">
+                            <div class="btn-title">Shorten</div>
+                            <div class="btn-description">Create a concise version of your text</div>
+                        </div>
                     </div>
                     <div class="chevron">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -889,14 +1002,25 @@
                 </div>
                 <div class="results-actions">
                     <button id="applyToFigma" class="action-btn primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                            <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         Apply to Figma
                     </button>
                 </div>
             </div>
         </main>
+        
+        <!-- Add settings button container -->
+        <div class="settings-button-container">
+            <button id="settingsButton" class="text-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                Settings
+            </button>
+        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -913,22 +1037,29 @@
         <div class="settings-section">
             <h3 class="settings-section-title">Language</h3>
             <select id="targetLanguageSelect" class="settings-select">
-                <option value="French (Canada)">French (Canada)</option>
-                <!-- Add other language options -->
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="fr-ca">French (Canada)</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+                <option value="nl">Dutch</option>
+                <option value="pl">Polish</option>
+                <option value="ru">Russian</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="zh">Chinese (Simplified)</option>
             </select>
         </div>
 
         <div class="settings-section">
             <h3 class="settings-section-title">Brand Guidelines</h3>
-            <div class="brand-guidelines">
-                <h3>Brand Voice & Style</h3>
-                <h4>Brand voice</h4>
-                <h4>Guiding Principles</h4>
-                <ul>
-                    <li>Be human: Write like you speak. Make it relatable.</li>
-                    <li>Use "you" and "your" to help make it personal.</li>
-                </ul>
-                <p>These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
+            <textarea id="brandGuidelinesInput" class="settings-textarea" placeholder="Enter your brand guidelines here..."></textarea>
+            <div id="saveConfirmation" class="save-confirmation">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                    <path d="M3 8l3.5 3.5L13 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Changes saved</span>
             </div>
         </div>
 
@@ -965,6 +1096,7 @@
             textEditor.style.display = 'none';
             document.querySelector('.action-panel').style.display = 'none';
             document.querySelector('.section-title').style.display = 'none';
+            document.querySelector('.settings-button-container').classList.add('hidden');
             resultsView.style.display = 'block';
         }
 
@@ -972,6 +1104,7 @@
             textEditor.style.display = 'block';
             document.querySelector('.action-panel').style.display = 'flex';
             document.querySelector('.section-title').style.display = 'block';
+            document.querySelector('.settings-button-container').classList.remove('hidden');
             resultsView.style.display = 'none';
             loadingIndicator.style.display = 'none';
         }
@@ -1083,7 +1216,16 @@
                     }
                     break;
 
-                // ... rest of message handling
+                case 'set-brand-guidelines':
+                    console.log('Received saved guidelines:', msg.guidelines);
+                    if (msg.guidelines) {
+                        brandGuidelinesInput.value = msg.guidelines;
+                    }
+                    break;
+
+                case 'set-language':
+                    // ... existing language handling ...
+                    break;
             }
         };
 
@@ -1120,6 +1262,71 @@
         // Add textarea event listeners
         textEditor.addEventListener('input', updateButtonStates);
         textEditor.addEventListener('change', updateButtonStates);
+
+        // Settings modal functionality
+        settingsButton.addEventListener('click', () => {
+            settingsModal.classList.add('visible');
+        });
+
+        closeButton.addEventListener('click', () => {
+            settingsModal.classList.remove('visible');
+        });
+
+        // Close modal when clicking outside
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.classList.remove('visible');
+            }
+        });
+
+        // Brand guidelines save functionality
+        const brandGuidelinesInput = document.getElementById('brandGuidelinesInput');
+        const saveConfirmation = document.getElementById('saveConfirmation');
+
+        let saveTimeout;
+
+        brandGuidelinesInput.addEventListener('input', () => {
+            // Clear any existing timeout
+            clearTimeout(saveTimeout);
+            
+            // Set new timeout to save after user stops typing
+            saveTimeout = setTimeout(async () => {
+                try {
+                    // Send to parent (Figma)
+                    parent.postMessage({ 
+                        pluginMessage: { 
+                            type: 'save-brand-guidelines',
+                            guidelines: brandGuidelinesInput.value 
+                        }
+                    }, '*');
+                    
+                    // Show save confirmation
+                    saveConfirmation.classList.add('visible');
+                    
+                    // Hide confirmation after 2 seconds
+                    setTimeout(() => {
+                        saveConfirmation.classList.remove('visible');
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Error saving guidelines:', error);
+                }
+            }, 500); // Wait 500ms after last keystroke before saving
+        });
+
+        // Add apply to Figma handler
+        applyToFigmaButton.addEventListener('click', () => {
+            // Send processed texts back to Figma
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'apply-text',
+                    texts: currentProcessedTexts
+                }
+            }, '*');
+            
+            // Return to editor view
+            showEditor();
+        });
     </script>
 </body>
 </html>

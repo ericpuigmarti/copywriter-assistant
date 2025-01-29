@@ -149,6 +149,43 @@ figma.ui.onmessage = async (msg) => {
                 theme: savedTheme || 'system'
             });
             break;
+
+        case 'apply-text':
+            console.log('Applying text changes:', msg.texts);
+            (async () => {  // Wrap in async IIFE
+                try {
+                    // Process text changes sequentially
+                    for (const item of msg.texts) {
+                        try {
+                            // Get the node
+                            const node = await figma.getNodeByIdAsync(item.id);
+                            
+                            if (!node || node.type !== "TEXT") {
+                                console.warn(`Node ${item.id} not found or not a text layer`);
+                                continue;
+                            }
+
+                            // Load the font first
+                            await figma.loadFontAsync(node.fontName);
+                            
+                            // Then update the text
+                            node.characters = item.text;
+                            console.log(`Successfully updated node ${item.id}`);
+                            
+                        } catch (err) {
+                            console.error(`Failed to update node ${item.id}:`, err);
+                            continue;
+                        }
+                    }
+                    
+                    figma.notify('Text updates complete');
+                    
+                } catch (error) {
+                    console.error('Error in apply-text:', error);
+                    figma.notify('Failed to update some text layers');
+                }
+            })();  // Immediately invoke the async function
+            break;
     }
 };
 
