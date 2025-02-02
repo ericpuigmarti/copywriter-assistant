@@ -105,13 +105,18 @@
             height: 100%;
         }
 
-        .header {
+        .logo-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 8px 16px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--header-bg);
+            justify-content: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
         main {
@@ -242,19 +247,38 @@
         }
 
         .loading {
-            text-align: center;
-            color: #6b7280;
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            margin-top: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: .5;
-            }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 16px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--secondary-text);
+            font-size: 14px;
+            font-weight: 500;
         }
 
         /* Modal */
@@ -665,10 +689,11 @@
             gap: 8px;
         }
 
-        .criteria-header {
+        .criterion-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            font-size: 14px;
+            color: var(--text-color);
         }
 
         .progress-bar {
@@ -953,13 +978,6 @@
             gap: 8px;
         }
 
-        .criterion-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
         .progress-bar {
             height: 8px;
             background: var(--button-bg);
@@ -1105,10 +1123,131 @@
             justify-content: space-between;
             width: 100%;
         }
+
+        /* Add this new style for the coming-soon tag */
+        .coming-soon-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            background-color: var(--button-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+
+        /* Add these styles for the disabled state of action buttons */
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .action-btn:disabled:hover {
+            background-color: var(--surface-color);
+        }
+
+        /* Add these styles for custom dropdowns */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 20px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 200ms ease;
+        }
+
+        .custom-select:hover {
+            background-color: var(--button-hover);
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .custom-select-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--secondary-text);
+        }
+
+        .custom-select-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+        }
+
+        /* Add these new styles for the dropdown options */
+        .custom-select option {
+            padding: 12px 16px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border: none;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        /* Unfortunately, styling select options is limited in most browsers. 
+           For a fully custom dropdown, we'll need to create our own: */
+
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-select-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: all 200ms ease;
+        }
+
+        .custom-select-option:hover {
+            background-color: var(--button-hover);
+        }
+
+        .custom-select-option.selected {
+            background-color: var(--accent-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo-header">
+            <img src="static/images/logo.png" alt="CopyMate Logo" class="logo">
+        </div>
         <main>
             <textarea id="textEditor" class="textarea" placeholder="Select text in Figma or type here..."></textarea>
             <div class="section-title">Writing tools</div>
@@ -1173,7 +1312,7 @@
                         </svg>
                     </div>
                 </button>
-                <button id="qualityCheckButton" class="action-btn">
+                <button id="qualityCheckButton" class="action-btn" disabled>
                     <div class="btn-content">
                         <div class="btn-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1187,7 +1326,7 @@
                         </div>
                     </div>
                     <div class="action-btn-end">
-                        <span class="premium-tag">Premium</span>
+                        <span class="coming-soon-tag">Coming Soon</span>
                         <div class="chevron">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1197,7 +1336,8 @@
                 </button>
             </div>
             <div id="loadingIndicator" class="loading" style="display: none;">
-                Processing...
+                <div class="spinner"></div>
+                <div class="loading-text">Processing...</div>
             </div>
             <div id="resultsView" class="results-view" style="display: none;">
                 <div class="results-header">
@@ -1324,13 +1464,16 @@
         
         <!-- Add settings button container -->
         <div class="settings-button-container">
-            <button id="settingsButton" class="text-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                Settings
-            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.0</span>
+                <button id="settingsButton" class="text-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Settings
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1347,21 +1490,28 @@
 
                 <div class="settings-section">
             <h3 class="settings-section-title">Language</h3>
-            <select id="targetLanguageSelect" class="settings-select">
-                            <option value="es">Spanish</option>
-                            <option value="fr">French</option>
-                            <option value="fr-ca">French (Canada)</option>
-                            <option value="de">German</option>
-                            <option value="it">Italian</option>
-                            <option value="pt">Portuguese</option>
-                            <option value="nl">Dutch</option>
-                            <option value="pl">Polish</option>
-                            <option value="ru">Russian</option>
-                            <option value="ja">Japanese</option>
-                            <option value="ko">Korean</option>
-                            <option value="zh">Chinese (Simplified)</option>
-                        </select>
-                    </div>
+            <div class="custom-select-wrapper">
+                <select id="targetLanguageSelect" class="custom-select">
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="fr-ca">French (Canada)</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="nl">Dutch</option>
+                    <option value="pl">Polish</option>
+                    <option value="ru">Russian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese (Simplified)</option>
+                </select>
+                <div class="custom-select-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
 
         <div class="settings-section">
             <div class="settings-section-header">
@@ -1380,14 +1530,22 @@
 
         <div class="settings-section">
             <h3 class="settings-section-title">Appearance</h3>
-            <select id="themeSelect" class="settings-select">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="system">System</option>
-            </select>
+            <div class="custom-select-wrapper">
+                <select id="themeSelect" class="custom-select">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="system">System</option>
+                </select>
+                <div class="custom-select-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Add Lottie script with load event listener -->
     <script>
         // UI Elements
         const textEditor = document.getElementById('textEditor');
@@ -1408,13 +1566,24 @@
         let currentProcessedTexts = [];
         let selectedTexts = new Map();
 
-        // Helper function to toggle views
+        // Initialize theme and request initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+            
+            // Request initial data
+            parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+        });
+
+        // Show/hide functions
         function showResults() {
             textEditor.style.display = 'none';
             document.querySelector('.action-panel').style.display = 'none';
             document.querySelector('.section-title').style.display = 'none';
             document.querySelector('.settings-button-container').classList.add('hidden');
             resultsView.style.display = 'block';
+            loadingIndicator.style.display = 'none';
         }
 
         function showEditor() {
@@ -1426,14 +1595,9 @@
             loadingIndicator.style.display = 'none';
         }
 
-        // Update the back button handler
-        backToEditButton.addEventListener('click', () => {
-            showEditor();
-        });
-
-        // Update API call handlers
+        // API call handler
         async function handleAPICall(endpoint, data) {
-            loadingIndicator.style.display = 'block';
+            loadingIndicator.style.display = 'flex';
             resultsView.style.display = 'none';
             textEditor.style.display = 'none';
             document.querySelector('.action-panel').style.display = 'none';
@@ -1592,16 +1756,6 @@
                     break;
             }
         };
-
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeTheme();
-            
-            // Request initial data
-            parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
-        });
 
         // Keep helper functions outside
         function setTheme(theme) {
@@ -1811,6 +1965,74 @@
                     language: selectedLanguage
                 }
             }, '*');
+        });
+
+        // Add this to your existing script section
+        function initializeCustomSelects() {
+            document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+                const select = wrapper.querySelector('select');
+                const customSelect = document.createElement('div');
+                customSelect.className = 'custom-select';
+                customSelect.textContent = select.options[select.selectedIndex].text;
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'custom-select-options';
+
+                // Create custom options
+                Array.from(select.options).forEach((option, index) => {
+                    const customOption = document.createElement('div');
+                    customOption.className = 'custom-select-option';
+                    if (index === select.selectedIndex) {
+                        customOption.classList.add('selected');
+                    }
+                    customOption.textContent = option.text;
+                    customOption.dataset.value = option.value;
+                    
+                    customOption.addEventListener('click', () => {
+                        select.value = option.value;
+                        customSelect.textContent = option.text;
+                        optionsContainer.style.display = 'none';
+                        
+                        // Remove selected class from all options
+                        optionsContainer.querySelectorAll('.custom-select-option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        customOption.classList.add('selected');
+                        
+                        // Trigger change event on the original select
+                        select.dispatchEvent(new Event('change'));
+                    });
+                    
+                    optionsContainer.appendChild(customOption);
+                });
+
+                // Replace the original select with our custom elements
+                select.style.display = 'none';
+                wrapper.appendChild(customSelect);
+                wrapper.appendChild(optionsContainer);
+
+                // Toggle options display
+                customSelect.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = optionsContainer.style.display === 'block';
+                    // Close all other open dropdowns
+                    document.querySelectorAll('.custom-select-options').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    optionsContainer.style.display = isOpen ? 'none' : 'block';
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    optionsContainer.style.display = 'none';
+                });
+            });
+        }
+
+        // Call this after the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCustomSelects();
+            // ... your other initialization code ...
         });
     </script>
 </body>

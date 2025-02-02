@@ -3,6 +3,20 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.0] - 2024-01-25
+
+### Added
+- Custom styled dropdown menus for language and theme selectors
+
+### Changed
+- Updated Quality Check feature to show "Coming Soon" instead of "Premium" tag
+- Disabled Quality Check button until feature is ready
+- Improved dropdown menu styling and interaction
+
+### Fixed
+- Dropdown menus now match the app's design system
+- Better visual consistency across UI elements
+
 ## [0.2.9] - 2024-01-25
 ### Fixed
 - Language preference persistence between plugin sessions
