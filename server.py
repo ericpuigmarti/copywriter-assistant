@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 import logging
 from config import Config
 import re
+import json
+from pathlib import Path
+import random
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -92,12 +95,19 @@ def shorten():
 def translate():
     try:
         data = request.json
+        logger.debug(f"Received translation request: {data}")
+        
         text = data.get('text', '')
         target_language = data.get('targetLanguage', '')
         
+        logger.debug(f"Text to translate: {text}")
+        logger.debug(f"Target language: {target_language}")
+        
         if not text or not target_language:
+            logger.error("Missing required fields")
             return jsonify({'error': 'Text and target language are required'}), 400
 
+        logger.debug("Calling OpenAI API...")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -107,13 +117,48 @@ def translate():
         )
         
         translated_text = response.choices[0].message.content.strip()
+        logger.debug(f"Translation result: {translated_text}")
+        
         return jsonify({'translatedText': translated_text})
 
     except Exception as e:
-        logger.error(f"Translation error: {str(e)}")
+        logger.error(f"Translation error: {str(e)}", exc_info=True)  # Added exc_info for stack trace
         return jsonify({'error': str(e)}), 500
 
-# Add quality check endpoint
+# Add this function to load the system prompt
+def load_system_prompt(filename):
+    prompt_path = Path(__file__).parent / filename
+    try:
+        with open(prompt_path, 'r') as file:
+            return file.read().strip()
+    except Exception as e:
+        print(f"Error loading system prompt: {e}")
+        return None
+
+# Update the system prompt loading to include response format
+QUALITY_CHECK_PROMPT = f"""
+{load_system_prompt('system_prompt_qualityCheck.txt')}
+
+IMPORTANT: Respond only in this JSON format:
+{{
+    "score": <overall_score_0_to_100>,
+    "summary": "<brief_explanation>",
+    "criteria": {{
+        "clarity": <score_0_to_100>,
+        "conciseness": <score_0_to_100>,
+        "readability": <score_0_to_100>,
+        "actionability": <score_0_to_100>,
+        "toneConsistency": <score_0_to_100>,
+        "brandFit": <score_0_to_100>
+    }},
+    "suggestions": [
+        "<suggestion_1>",
+        "<suggestion_2>",
+        "<suggestion_3>"
+    ]
+}}
+"""
+
 @app.route('/quality-check', methods=['POST'])
 def quality_check():
     try:
@@ -121,61 +166,97 @@ def quality_check():
         text = data.get('text', '')
         brand_guidelines = data.get('brandGuidelines', '')
 
-        # Basic text metrics
-        char_count = len(text)
-        word_count = len(text.split())
-        sentences = len(re.split(r'[.!?]+', text))
-        
-        # Estimate reading and speaking times
-        reading_time = round(word_count / 250 * 60)  # Average reading speed: 250 words/min
-        speaking_time = round(word_count / 150 * 60)  # Average speaking speed: 150 words/min
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
 
-        # Calculate average word length
-        word_length = round(char_count / word_count, 1) if word_count > 0 else 0
-        
-        # Calculate average sentence length
-        sentence_length = round(word_count / sentences, 1) if sentences > 0 else 0
+        # Enhanced error handling for inputs
+        if len(text) > 5000:  # Reasonable limit for API
+            return jsonify({'error': 'Text too long. Maximum 5000 characters.'}), 400
 
-        # Get quality score from OpenAI
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": open('system_prompt_qualityCheck.txt').read()},
-                {"role": "user", "content": text}
-            ]
-        )
-        
-        # Extract score from response with better error handling
-        response_text = response.choices[0].message.content
+        # Prepare the messages with better context
+        messages = [
+            {"role": "system", "content": QUALITY_CHECK_PROMPT},
+            {"role": "user", "content": f"""
+Text to evaluate:
+{text}
+
+Brand Guidelines:
+{brand_guidelines if brand_guidelines else 'No specific brand guidelines provided.'}
+
+Remember to respond only in the specified JSON format.
+"""}
+        ]
+
+        # Call OpenAI with better error handling
         try:
-            # Look for "Score: X/100" pattern
-            score_match = re.search(r'Score:\s*(\d+)', response_text)
-            if score_match:
-                score = int(score_match.group(1))
-            else:
-                # Fallback to a default score if pattern not found
-                score = 70
-                logger.warning(f"Could not extract score from response: {response_text}")
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                temperature=0.7,
+                max_tokens=1000,
+                response_format={ "type": "json_object" }  # Ensure JSON response
+            )
         except Exception as e:
-            logger.error(f"Error parsing score: {e}")
-            score = 70  # Default score if parsing fails
+            logger.error(f"OpenAI API error: {e}")
+            return jsonify({'error': 'Failed to process text. Please try again.'}), 500
 
-        return jsonify({
-            'score': score,
-            'metrics': {
-                'characters': char_count,
-                'words': word_count,
-                'sentences': sentences,
-                'readingTime': reading_time,
-                'speakingTime': speaking_time,
-                'wordLength': word_length,
-                'sentenceLength': sentence_length
-            }
-        })
+        # Parse the response with better error handling
+        try:
+            response_text = response.choices[0].message.content
+            response_data = json.loads(response_text)
+
+            # Validate response structure
+            required_fields = ['score', 'summary', 'criteria', 'suggestions']
+            required_criteria = ['clarity', 'conciseness', 'readability', 
+                               'actionability', 'toneConsistency', 'brandFit']
+
+            # Check all required fields exist
+            for field in required_fields:
+                if field not in response_data:
+                    raise ValueError(f"Missing required field: {field}")
+
+            # Check all criteria exist
+            for criterion in required_criteria:
+                if criterion not in response_data['criteria']:
+                    raise ValueError(f"Missing required criterion: {criterion}")
+
+            # Validate score ranges
+            if not (0 <= response_data['score'] <= 100):
+                raise ValueError("Overall score out of range")
+
+            for criterion, score in response_data['criteria'].items():
+                if not (0 <= score <= 100):
+                    raise ValueError(f"Criterion score out of range: {criterion}")
+
+            # Ensure we have suggestions
+            if not response_data['suggestions'] or len(response_data['suggestions']) < 1:
+                response_data['suggestions'] = [
+                    "Consider revising for clarity and conciseness.",
+                    "Review the text for better alignment with brand guidelines.",
+                    "Check readability and sentence structure."
+                ]
+
+            # Log successful analysis
+            logger.info(f"Successfully analyzed text. Score: {response_data['score']}")
+
+            return jsonify(response_data)
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse OpenAI response as JSON: {e}")
+            return jsonify({'error': 'Invalid response format from analysis.'}), 500
+        except ValueError as e:
+            logger.error(f"Invalid response data: {e}")
+            return jsonify({'error': str(e)}), 500
+        except Exception as e:
+            logger.error(f"Unexpected error processing response: {e}")
+            return jsonify({'error': 'Failed to process analysis results.'}), 500
 
     except Exception as e:
-        logger.error(f"Quality check error: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Quality check error: {e}")
+        return jsonify({
+            'error': 'Failed to perform quality check. Please try again.',
+            'details': str(e)
+        }), 500
 
 if __name__ == '__main__':
     logger.info("Starting server...")

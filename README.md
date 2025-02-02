@@ -1,40 +1,72 @@
-# CopyMate - AI Copywriting Assistant for Figma
+# CopyMate - Smarter, Faster, Better Copywriting
 
 A Figma plugin that helps designers and writers create, translate, and enhance copy directly within Figma.
 
-## Features
+## Current Features
+- 🌐 **Text Translation**: Convert text to multiple languages while preserving formatting
+- ✨ **Text Enhancement**: Improve writing quality and clarity with AI suggestions
+- 📝 **Text Shortening**: Create concise versions of your text while maintaining meaning
+- 🎯 **Quality Check**: Analyze and score your copy across multiple criteria (Premium)
+- 🎨 **Brand Guidelines**: Ensure text aligns with your brand voice (Premium)
+- 🖼️ **Frame Support**: Select entire frames to process multiple text layers at once
+- 🌙 **Dark Mode**: Full dark mode support with system preference detection
+- 🎨 **Style Preservation**: Maintains all Figma text styling during updates
 
-### Translation
-- Supports 12 languages including:
-  - Spanish, French (including Canadian French)
-  - German, Italian, Portuguese
-  - Dutch, Polish, Russian
-  - Japanese, Korean, Chinese (Simplified)
+## Planned Enhancements
+- 🔄 Batch processing for multiple frames
+- 💾 Save and reuse common text transformations
+- 📊 Quality check score history and trends
+- ⭐ Copy effectiveness score with AI-powered readability and impact score
 
-### Brand Guidelines
-- Built-in brand guidelines editor
-- Auto-saves as you type
-- Visual feedback for saved changes
-- Applies guidelines to all text operations
+## Installation
 
-### Settings & Preferences
-- Language selection
-- Theme customization (Light/Dark/System)
-- Persistent settings across sessions
+1. Open Figma
+2. Go to Menu > Plugins > Browse Plugins...
+3. Search for "Copywriting Assistant"
+4. Click "Install"
+
+## Usage
+
+1. Select text layer(s) in Figma
+2. Run the plugin
+3. Choose your desired action (Translate, Improve it, Shorten)
+4. Review and apply changes
 
 ## Development
 
-### Setup
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start the development server: `python server.py`
-4. Import the plugin into Figma
+### Prerequisites
 
-### Requirements
-- Python 3.7+
-- Flask
-- OpenAI API key
+- Node.js
+- npm/yarn
 - Figma desktop app
+
+1. Clone the repository
+2. Install dependencies:    ```bash
+   # Install Node dependencies
+   npm install
+
+   # Install Python dependencies
+   pip install -r requirements.txt   ```
+
+3. Create a `.env` file based on `.env.example`:   ```bash
+   cp .env.example .env
+   # Add your OpenAI API key to .env   ```
+
+### Running Locally
+
+1. Start the Flask server:   ```bash
+   # In one terminal
+   python server.py
+   # Server will start at http://localhost:5000   ```
+
+2. Start the Figma plugin:   ```bash
+   # In another terminal
+   npm run dev   ```
+
+3. In Figma desktop app:
+   - Go to Plugins > Development > Import plugin from manifest...
+   - Select the `manifest.json` file from this repository
+   - The plugin should now appear in your development plugins
 
 ## Contributing
 Contributions are welcome! Please read our contributing guidelines before submitting pull requests.

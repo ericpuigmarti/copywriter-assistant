@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copywriter Assistant</title>
+    <title>CopyMate - Smarter, Faster, Better Copywriting</title>
     <style>
+        /* Add Inter font import at the top of the CSS */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
         /* Theme variables */
         :root[data-theme="light"] {
             --background-color: #FFFFFF;
@@ -79,8 +82,8 @@
         }
 
         body {
-            /* Use system fonts with Inter-like alternatives */
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            /* Update the body font-family */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             width: 400px;
             height: 600px;
             overflow: hidden;
@@ -88,6 +91,11 @@
             color: var(--text-color);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Ensure consistent font rendering */
+        * {
+            text-rendering: optimizeLegibility;
         }
 
         /* Layout */
@@ -147,10 +155,10 @@
         /* Update button styles */
         .action-btn {
             width: 100%;
-            padding: 12px 16px;
-            border: none; /* Remove border */
+            padding: 16px;
+            border: none;
             border-radius: 8px;
-            background-color: transparent;
+            background-color: var(--surface-color);  /* Add subtle background */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -185,23 +193,25 @@
         .btn-title {
             font-size: 14px;
             font-weight: 500;
-            color: #0E0D10;
+            color: var(--text-color);
         }
 
         .btn-description {
-            font-size: 12px;
-            color: #71717A;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--secondary-text);
+            letter-spacing: 0.04em;
         }
 
         .btn-icon {
             width: 16px;
             height: 16px;
-            color: #71717A;
+            color: var(--secondary-text);
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none; /* Remove any potential border from icon containers */
+            border: none;
         }
 
         .btn-icon svg {
@@ -215,12 +225,12 @@
         .chevron {
             width: 16px;
             height: 16px;
-            color: #71717A;
+            color: var(--secondary-text);
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none; /* Remove any potential border from icon containers */
+            border: none;
         }
 
         .chevron svg {
@@ -314,7 +324,8 @@
             color: var(--secondary-text);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 12px;
+            margin: 0;
+            line-height: 1.4;
         }
 
         .setting-item {
@@ -411,87 +422,56 @@
 
         /* Results View */
         #resultsView {
-            margin-top: 1rem;
-        }
-
-        .btn-icon {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            border: none;
-            background: none;
-            color: var(--text-color);
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-
-        .btn-icon:hover {
-            color: var(--accent-color);
-        }
-
-        .results-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin: 16px 0;
-        }
-
-        .results-column {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--input-bg);
+            padding: 16px;
         }
 
         .results-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--button-bg);
-            border-radius: 6px 6px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 16px;  /* Add space between header and container */
         }
 
-        .results-header h3 {
-            margin: 0;
-            font-size: 14px;
+        .results-container {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .results-column {
+            background: var(--surface-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .results-column-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .results-column-header h3 {
+            font-size: 13px;
             font-weight: 600;
-            color: var(--text-color);
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0;
         }
 
         .results-content {
             padding: 16px;
-            flex-grow: 1;
-            overflow-y: auto;
-            max-height: 300px;
-        }
-
-        .results-content p {
-            margin: 0;
             font-size: 14px;
             line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .results-divider {
-            display: flex;
-            justify-content: center;
-            color: var(--secondary-text);
-            height: 24px;
-        }
-
-        .original {
-            background-color: var(--input-bg);
-            color: var(--secondary-text);
-        }
-
-        .processed {
-            background-color: var(--input-bg);
             color: var(--text-color);
+        }
+
+        .results-content.original {
+            color: var(--secondary-text);
+            text-decoration: line-through;  /* Add strikethrough */
+            text-decoration-color: var(--secondary-text);  /* Match text color */
+            text-decoration-thickness: 1px;  /* Thin line */
+            opacity: 0.8;  /* Slightly faded */
+        }
+
+        .results-content.processed {
+            background: var(--surface-color);
         }
 
         .results-actions {
@@ -564,21 +544,22 @@
 
         /* Update primary button styles */
         .action-btn.primary {
-            background-color: #3B82F6;  /* Updated blue color */
-            color: white;
+            background-color: var(--text-color);  /* Dark in light mode, white in dark mode */
+            color: var(--background-color);  /* Inverse text color */
             padding: 12px 24px;
-            border-radius: 6px;
+            border-radius: 100px;  /* More rounded corners */
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-size: 14px;
-            font-weight: 500;
-            width: auto;  /* Override full width */
-            transition: background-color 200ms ease;
+            font-weight: 600;
+            width: 100%;  /* Full width like the image */
+            transition: all 200ms ease;
         }
 
         .action-btn.primary:hover {
-            background-color: #2563EB;  /* Darker blue on hover */
+            background-color: var(--secondary-text);  /* Slightly lighter on hover */
         }
 
         .action-btn.primary svg {
@@ -611,9 +592,23 @@
 
         .score-display {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
+            align-items: baseline;
+            gap: 4px;
+            margin: 24px 0;
+            color: var(--text-color);
+        }
+
+        .score-display #qualityScore {
+            font-size: 64px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .score-display::after {
+            content: "/100";
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--secondary-text);
         }
 
         .score-circle {
@@ -735,17 +730,27 @@
         .back-button {
             display: flex;
             align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
             background: none;
             border: none;
-            color: var(--text-color);
-            cursor: pointer;
             padding: 8px;
-            margin: -8px;
+            cursor: pointer;
+            color: var(--text-color);
             border-radius: 6px;
+            margin-left: -8px;  /* Align with container padding */
         }
 
         .back-button:hover {
             background: var(--button-hover);
+        }
+
+        .back-button svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 1.5;
         }
 
         .settings-title {
@@ -764,7 +769,8 @@
             color: var(--secondary-text);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 12px;
+            margin: 0;
+            line-height: 1.4;
         }
 
         /* Update Dropdown Select Styles */
@@ -881,9 +887,17 @@
             margin-left: -8px;
         }
 
-        /* Add hover effect without border */
+        /* Update button hover state */
         .action-btn:hover {
-            background-color: #F4F4F5;
+            background-color: var(--button-hover);
+        }
+
+        .action-btn:hover .btn-title {
+            color: var(--text-color);
+        }
+
+        .action-btn:hover .btn-description {
+            color: var(--secondary-text);
         }
 
         /* Update settings button container styles */
@@ -898,6 +912,198 @@
         .settings-button-container.hidden {
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Add these styles to your existing CSS */
+        .quality-results {
+            padding: 16px;
+        }
+
+        .quality-score-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: 600;
+            margin: 24px 0;
+            color: var(--text-color);
+        }
+
+        .quality-summary {
+            color: var(--secondary-text);
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .criteria-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .criterion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .criterion-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--button-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .suggestions-section {
+            margin-top: 24px;
+        }
+
+        .suggestions-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        #suggestionsList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #suggestionsList li {
+            position: relative;
+            padding-left: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--secondary-text);
+        }
+
+        #suggestionsList li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: var(--accent-color);
+        }
+
+        /* Add these styles */
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--text-color);
+            border-radius: 6px;
+        }
+
+        .back-button:hover {
+            background: var(--button-hover);
+        }
+
+        /* Update the apply button container */
+        .apply-button-container {
+            padding: 0 16px 16px;
+            margin-top: auto;  /* Push to bottom */
+        }
+
+        /* Add styles for text separators */
+        .results-content hr {
+            margin: 12px 0;
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .results-content p {
+            margin: 0;
+            padding: 0;
+            white-space: pre-wrap;
+        }
+
+        .settings-section-caption {
+            font-size: 13px;
+            color: var(--secondary-text);
+            margin: 4px 0 12px 0;
+            line-height: 1.4;
+        }
+
+        /* Add styles for premium indicator */
+        .action-btn-end {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;  /* Push to right */
+        }
+
+        .premium-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-text);  /* White icon */
+            background-color: var(--accent-color);  /* Purple background */
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            padding: 3px;
+        }
+
+        .premium-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .premium-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-color);
+            background-color: var(--button-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+
+        /* Update settings section header styles */
+        .settings-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
         }
     </style>
 </head>
@@ -931,11 +1137,11 @@
                     <div class="btn-content">
                         <div class="btn-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 13 2"></polygon>
                             </svg>
                         </div>
                         <div class="btn-text">
-                            <div class="btn-title">Enhance</div>
+                            <div class="btn-title">Improve it</div>
                             <div class="btn-description">Improve writing quality and clarity</div>
                         </div>
                     </div>
@@ -967,46 +1173,151 @@
                         </svg>
                     </div>
                 </button>
+                <button id="qualityCheckButton" class="action-btn">
+                    <div class="btn-content">
+                        <div class="btn-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="btn-text">
+                            <span class="btn-title">Quality Check</span>
+                            <span class="btn-description">Analyze and score your copy</span>
+                        </div>
+                    </div>
+                    <div class="action-btn-end">
+                        <span class="premium-tag">Premium</span>
+                        <div class="chevron">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </button>
             </div>
             <div id="loadingIndicator" class="loading" style="display: none;">
                 Processing...
             </div>
-            <div id="resultsView" style="display: none;">
-                <button id="backToEdit" class="btn-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Back to Edit
+            <div id="resultsView" class="results-view" style="display: none;">
+                <div class="results-header">
+                    <button id="backToEdit" class="back-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                            <path d="M10 12L6 8L10 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                 </button>
+                    <h2>Results</h2>
+                </div>
+                
                 <div class="results-container">
                     <div class="results-column">
-                        <div class="results-header">
+                        <div class="results-column-header">
                             <h3>Original Text</h3>
                         </div>
                         <div class="results-content original">
-                            <p id="originalText"></p>
+                    <p id="originalText"></p>
                         </div>
-                    </div>
-                    <div class="results-divider">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="7 13 12 18 17 13"></polyline>
-                            <polyline points="7 6 12 11 17 6"></polyline>
-                        </svg>
                     </div>
                     <div class="results-column">
-                        <div class="results-header">
-                            <h3>Processed Text</h3>
+                        <div class="results-column-header">
+                            <h3>Enhanced Text</h3>
                         </div>
                         <div class="results-content processed">
-                            <p id="processedText"></p>
+                    <p id="processedText"></p>
                         </div>
                     </div>
                 </div>
-                <div class="results-actions">
+                
+                <div class="apply-button-container">
                     <button id="applyToFigma" class="action-btn primary">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
                             <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        Apply to Figma
-                    </button>
+                            Apply to Figma
+                        </button>
+                </div>
+            </div>
+            <div id="qualityCheckResults" class="quality-results" style="display: none;">
+                <div class="quality-score-card">
+                    <div class="results-header">
+                        <button id="backFromQualityCheck" class="back-button">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                                <path d="M10 12L6 8L10 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <h2>Quality Check Result</h2>
+                    </div>
+                    <div class="score-display">
+                        <span id="qualityScore">-</span>
+                    </div>
+                    <p id="qualitySummary" class="quality-summary"></p>
+                    
+                    <div class="criteria-breakdown">
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Clarity</span>
+                                <span id="clarityScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="clarityBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Conciseness</span>
+                                <span id="concisenessScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="concisenessBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Readability</span>
+                                <span id="readabilityScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="readabilityBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Actionability</span>
+                                <span id="actionabilityScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="actionabilityBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Tone & Consistency</span>
+                                <span id="toneScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="toneBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-header">
+                                <span>Brand Fit</span>
+                                <span id="brandFitScore">-%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="brandFitBar" class="progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestions-section">
+                        <h3>Suggestions for Improvement</h3>
+                        <ul id="suggestionsList"></ul>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1029,31 +1340,35 @@
             <button class="back-button" id="closeSettings">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
+                    </svg>
+                </button>
             <h2 class="settings-title">Settings & Preferences</h2>
-        </div>
+            </div>
 
-        <div class="settings-section">
+                <div class="settings-section">
             <h3 class="settings-section-title">Language</h3>
             <select id="targetLanguageSelect" class="settings-select">
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="fr-ca">French (Canada)</option>
-                <option value="de">German</option>
-                <option value="it">Italian</option>
-                <option value="pt">Portuguese</option>
-                <option value="nl">Dutch</option>
-                <option value="pl">Polish</option>
-                <option value="ru">Russian</option>
-                <option value="ja">Japanese</option>
-                <option value="ko">Korean</option>
-                <option value="zh">Chinese (Simplified)</option>
-            </select>
-        </div>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="fr-ca">French (Canada)</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="nl">Dutch</option>
+                            <option value="pl">Polish</option>
+                            <option value="ru">Russian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                            <option value="zh">Chinese (Simplified)</option>
+                        </select>
+                    </div>
 
         <div class="settings-section">
-            <h3 class="settings-section-title">Brand Guidelines</h3>
+            <div class="settings-section-header">
+                <h3 class="settings-section-title">Brand Guidelines</h3>
+                <span class="premium-tag">Premium</span>
+                </div>
+            <p class="settings-section-caption">These guidelines will be applied to all text operations to maintain consistent brand voice.</p>
             <textarea id="brandGuidelinesInput" class="settings-textarea" placeholder="Enter your brand guidelines here..."></textarea>
             <div id="saveConfirmation" class="save-confirmation">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
@@ -1088,6 +1403,8 @@
         const backToEditButton = document.getElementById('backToEdit');
         const applyToFigmaButton = document.getElementById('applyToFigma');
         const themeSelect = document.getElementById('themeSelect');
+        const qualityCheckButton = document.getElementById('qualityCheckButton');
+        const qualityCheckResults = document.getElementById('qualityCheckResults');
         let currentProcessedTexts = [];
         let selectedTexts = new Map();
 
@@ -1123,16 +1440,53 @@
             document.querySelector('.section-title').style.display = 'none';
             
             try {
-                const response = await callAPI(endpoint, data);
-                document.getElementById('originalText').textContent = textEditor.value;
+                // Process each text separately while maintaining the mapping
+                const processedTexts = [];
+                for (const [id, originalText] of selectedTexts.entries()) {
+                    const response = await callAPI(endpoint, {
+                        ...data,
+                        text: originalText
+                    });
+                    
+                    // Get the processed text based on endpoint
+                    const processedText = response.translatedText || response.enhancedText || response.shortenedText;
+                    
+                    processedTexts.push({
+                        id,
+                        original: originalText,
+                        processed: processedText
+                    });
+                }
                 
-                // Set the processed text based on the endpoint
-                const processedText = response.translatedText || response.enhancedText || response.shortenedText;
-                document.getElementById('processedText').textContent = processedText;
+                // Display results
+                const originalTextDiv = document.getElementById('originalText');
+                const processedTextDiv = document.getElementById('processedText');
                 
-                currentProcessedTexts = Array.from(selectedTexts.keys()).map(id => ({
-                    id: id,
-                    text: processedText
+                // Clear previous content
+                originalTextDiv.innerHTML = '';
+                processedTextDiv.innerHTML = '';
+                
+                // Display each text pair
+                processedTexts.forEach(({ original, processed }, index) => {
+                    if (index > 0) {
+                        // Add separator between multiple texts
+                        originalTextDiv.appendChild(document.createElement('hr'));
+                        processedTextDiv.appendChild(document.createElement('hr'));
+                    }
+                    
+                    const originalP = document.createElement('p');
+                    originalP.textContent = original;
+                    originalTextDiv.appendChild(originalP);
+                    
+                    const processedP = document.createElement('p');
+                    processedP.textContent = processed;
+                    processedTextDiv.appendChild(processedP);
+                });
+                
+                // Store processed texts with their IDs for applying back to Figma
+                currentProcessedTexts = processedTexts.map(({ id, processed }) => ({
+                    id,
+                    text: processed
                 }));
                 
                 loadingIndicator.style.display = 'none';
@@ -1224,7 +1578,17 @@
                     break;
 
                 case 'set-language':
-                    // ... existing language handling ...
+                    console.log('Setting language to:', msg.language);
+                    if (msg.language) {
+                        targetLanguageSelect.value = msg.language;
+                    }
+                    break;
+
+                case 'set-theme':
+                    if (msg.theme) {
+                        setTheme(msg.theme);
+                        themeSelect.value = msg.theme;
+                    }
                     break;
             }
         };
@@ -1241,14 +1605,22 @@
 
         // Keep helper functions outside
         function setTheme(theme) {
-            // ... theme setting code ...
+            if (theme === 'system') {
+                // Remove any explicit theme
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                // Set explicit theme
+                document.documentElement.setAttribute('data-theme', theme);
+            }
         }
 
         function initializeTheme() {
-            document.documentElement.setAttribute('data-theme', 'light');
-            if (themeSelect) {
-                themeSelect.value = 'light';
-            }
+            // Request saved theme from Figma
+            parent.postMessage({ 
+                pluginMessage: { 
+                    type: 'get-theme' 
+                }
+            }, '*');
         }
 
         // Function to update button states
@@ -1293,12 +1665,12 @@
             saveTimeout = setTimeout(async () => {
                 try {
                     // Send to parent (Figma)
-                    parent.postMessage({ 
-                        pluginMessage: { 
+            parent.postMessage({
+                pluginMessage: {
                             type: 'save-brand-guidelines',
                             guidelines: brandGuidelinesInput.value 
-                        }
-                    }, '*');
+                }
+            }, '*');
                     
                     // Show save confirmation
                     saveConfirmation.classList.add('visible');
@@ -1308,7 +1680,7 @@
                         saveConfirmation.classList.remove('visible');
                     }, 2000);
                     
-                } catch (error) {
+            } catch (error) {
                     console.error('Error saving guidelines:', error);
                 }
             }, 500); // Wait 500ms after last keystroke before saving
@@ -1326,6 +1698,119 @@
             
             // Return to editor view
             showEditor();
+        });
+
+        // Add quality check button handler
+        qualityCheckButton.addEventListener('click', async () => {
+            if (!textEditor.value.trim()) return;
+            
+            try {
+                // Show loading state
+                loadingIndicator.style.display = 'block';
+                textEditor.style.display = 'none';
+                document.querySelector('.action-panel').style.display = 'none';
+                document.querySelector('.section-title').style.display = 'none';
+                
+                // Get brand guidelines if they exist
+                const brandGuidelines = document.getElementById('brandGuidelinesInput')?.value || '';
+                
+                // Call API
+                const response = await callAPI('quality-check', {
+                    text: textEditor.value,
+                    brandGuidelines: brandGuidelines
+                });
+                
+                // Update UI with results
+                document.getElementById('qualityScore').textContent = response.score;
+                document.getElementById('qualitySummary').textContent = response.summary;
+                
+                // Update individual scores and progress bars
+                updateScore('clarity', response.criteria.clarity);
+                updateScore('conciseness', response.criteria.conciseness);
+                updateScore('readability', response.criteria.readability);
+                updateScore('actionability', response.criteria.actionability);
+                updateScore('tone', response.criteria.toneConsistency);
+                updateScore('brandFit', response.criteria.brandFit);
+                
+                // Update suggestions
+                const suggestionsList = document.getElementById('suggestionsList');
+                suggestionsList.innerHTML = ''; // Clear existing suggestions
+                response.suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.textContent = suggestion;
+                    suggestionsList.appendChild(li);
+                });
+                
+                // Show results
+                loadingIndicator.style.display = 'none';
+                resultsView.style.display = 'none';
+                qualityCheckResults.style.display = 'block';
+                document.querySelector('.settings-button-container').classList.add('hidden');
+                
+            } catch (error) {
+                console.error('Quality check error:', error);
+                loadingIndicator.style.display = 'none';
+                showEditor();
+                alert('Quality check failed. Please try again. ' + error.message);
+            }
+        });
+
+        // Helper function to update scores and progress bars
+        function updateScore(criterionName, score) {
+            const scoreElement = document.getElementById(`${criterionName}Score`);
+            const barElement = document.getElementById(`${criterionName}Bar`);
+            
+            if (scoreElement && barElement) {
+                scoreElement.textContent = `${score}%`;
+                barElement.style.width = `${score}%`;
+            }
+        }
+
+        // Update showEditor function to hide quality check results
+        function showEditor() {
+            textEditor.style.display = 'block';
+            document.querySelector('.action-panel').style.display = 'flex';
+            document.querySelector('.section-title').style.display = 'block';
+            document.querySelector('.settings-button-container').classList.remove('hidden');
+            resultsView.style.display = 'none';
+            qualityCheckResults.style.display = 'none';
+            loadingIndicator.style.display = 'none';
+        }
+
+        // Add with other element selections at the top
+        const backFromQualityCheck = document.getElementById('backFromQualityCheck');
+
+        // Add the click handler
+        backFromQualityCheck.addEventListener('click', () => {
+            showEditor();
+        });
+
+        // Add theme change handler
+        themeSelect.addEventListener('change', (e) => {
+            const selectedTheme = e.target.value;
+            setTheme(selectedTheme);
+            
+            // Save theme preference to Figma storage
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'save-theme',
+                    theme: selectedTheme
+                }
+            }, '*');
+        });
+
+        // Add this after the other event listeners in the script section
+        targetLanguageSelect.addEventListener('change', (e) => {
+            const selectedLanguage = e.target.value;
+            console.log('Language changed to:', selectedLanguage);
+            
+            // Save language preference to Figma storage
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'save-language',
+                    language: selectedLanguage
+                }
+            }, '*');
         });
     </script>
 </body>

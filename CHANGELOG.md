@@ -3,7 +3,24 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
-## [Unreleased]
+## [0.2.9] - 2024-01-25
+### Fixed
+- Language preference persistence between plugin sessions
+- Language selection change handler in UI
+- Network access warnings by adding Figma API domain
+
+### Changed
+- Updated manifest.json network access configuration
+- Improved language selection event handling
+- Enhanced language state management and logging
+
+### Technical
+- Added event listener for language selection changes
+- Updated manifest.json allowedDomains to include Figma API
+- Enhanced console logging for language-related operations
+- Improved language preference synchronization between UI and plugin
+
+## [0.2.8] - 2024-01-25
 ### Changed
 - Removed background from language and appearance dropdowns
 - Removed background from brand guidelines textarea
@@ -21,6 +38,21 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Improved async operations handling in text application
 - Enhanced error boundaries in text processing
 - Optimized settings button visibility management
+
+### Added
+- Premium tag indicator for Quality Check and Brand Guidelines features
+- Support for selecting frames/groups to find nested text layers
+- Inter font family for improved typography
+- Consistent back button styling across all views
+- Better before/after text comparison layout in results view
+
+### Changed
+- Improved button styling with subtle backgrounds
+- Updated primary button design with rounded corners
+- Enhanced text descriptions and captions
+- Refined spacing and padding throughout the interface
+- Better handling of multiple text layer selections
+- Increased plugin height to 640px for better content display
 
 ## [0.2.7] - 2024-01-24
 ### Fixed

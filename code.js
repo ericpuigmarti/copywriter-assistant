@@ -1,8 +1,87 @@
 // Show the UI
-figma.showUI(__html__, { width: 400, height: 600 });
+figma.showUI(__html__, { width: 400, height: 640 });
+
+// Add these font loading functions at the top of the file
+async function loadInterFontStyles() {
+    try {
+        await Promise.all([
+            figma.loadFontAsync({ family: "Inter", style: "Regular" }),
+            figma.loadFontAsync({ family: "Inter", style: "Medium" }),
+            figma.loadFontAsync({ family: "Inter", style: "Semi Bold" }),
+            figma.loadFontAsync({ family: "Inter", style: "Bold" })
+        ]);
+        return true;
+    } catch (error) {
+        console.error("Error loading Inter font:", error);
+        return false;
+    }
+}
+
+// Initialize plugin settings
+async function initializeSettings() {
+    try {
+        // Load Inter font first
+        const fontsLoaded = await loadInterFontStyles();
+        if (!fontsLoaded) {
+            figma.notify("Failed to load Inter font. Using system font as fallback.");
+        }
+
+        // Get saved language - add more logging
+        const savedLanguage = await figma.clientStorage.getAsync('targetLanguage');
+        console.log('[initializeSettings] Loaded saved language:', savedLanguage);
+        
+        // Send language to UI with explicit default
+        const languageToUse = savedLanguage || 'es';
+        console.log('[initializeSettings] Setting language to:', languageToUse);
+        figma.ui.postMessage({
+            type: 'set-language',
+            language: languageToUse
+        });
+
+        // Get saved theme
+        const savedTheme = await figma.clientStorage.getAsync('theme');
+        figma.ui.postMessage({
+            type: 'set-theme',
+            theme: savedTheme || 'system'
+        });
+
+        // Get saved brand guidelines
+        const savedGuidelines = await figma.clientStorage.getAsync('brandGuidelines');
+        figma.ui.postMessage({
+            type: 'set-brand-guidelines',
+            guidelines: savedGuidelines || ''
+        });
+
+    } catch (error) {
+        console.error('[initializeSettings] Error:', error);
+        figma.notify('Error loading settings');
+    }
+}
+
+// Call initialize function right after showing UI
+initializeSettings();
 
 // Add a global variable to store text mappings
 let selectedTextLayers = new Map();
+
+// Add this helper function to recursively find text layers
+function findTextLayers(node, textLayers = []) {
+    // Check if node is a text layer
+    if (node.type === "TEXT") {
+        textLayers.push({
+            id: node.id,
+            text: node.characters,
+            node: node  // Store reference to the node for later use
+        });
+    }
+    // If node has children (like a frame or group), traverse them
+    else if ("children" in node) {
+        for (const child of node.children) {
+            findTextLayers(child, textLayers);
+        }
+    }
+    return textLayers;
+}
 
 // Function to handle text extraction
 function handleSelection() {
@@ -11,41 +90,52 @@ function handleSelection() {
     console.log('Current selection:', selection);
     
     if (selection.length > 0) {
-        let allTextNodes = [];
+        let allTextLayers = [];
         selectedTextLayers.clear();
         
         // Process each selected node
         for (const node of selection) {
-            if (node.type === 'TEXT') {
-                allTextNodes.push({
-                    id: node.id,
-                    text: node.characters,
-                    node: node
-                });
-            }
+            // Find all text layers in this node (or its children)
+            const textLayers = findTextLayers(node);
+            allTextLayers = allTextLayers.concat(textLayers);
         }
         
         // Send extracted text to UI
-        const textsForUI = allTextNodes.map(item => {
-            if (item.text.trim().length > 0) {
+        if (allTextLayers.length > 0) {
+            console.log('Text layers found:', allTextLayers);
+            allTextLayers.forEach(item => {
                 selectedTextLayers.set(item.id, {
                     text: item.text,
                     node: item.node
                 });
-                return {
-                    id: item.id,
-                    text: item.text
-                };
-            }
-        }).filter(Boolean);
-
-        if (textsForUI.length > 0) {
-            console.log('Texts extracted:', textsForUI);
+            });
+            
+            // Send only necessary data to UI
+            const textsForUI = allTextLayers.map(({ id, text }) => ({ id, text }));
             figma.ui.postMessage({
                 type: 'selected-text',
-                texts: textsForUI
+                texts: textsForUI,
+                hasContent: true
             });
+        } else {
+            console.log('No text layers found in selection');
+            figma.ui.postMessage({
+                type: 'selected-text',
+                texts: [],
+                hasContent: false,
+                error: 'No text layers in selection'
+            });
+            figma.notify('⚠️ Please select text layer(s) to work with');
         }
+    } else {
+        console.log('No selection');
+        figma.ui.postMessage({
+            type: 'selected-text',
+            texts: [],
+            hasContent: false,
+            error: 'Nothing selected'
+        });
+        figma.notify('⚠️ Please select text layer(s) to work with');
     }
 }
 
@@ -72,6 +162,18 @@ figma.ui.onmessage = async (msg) => {
         case 'update-text':
             console.log('Received update-text request:', msg.processedTexts);
             try {
+                if (!selectedTextLayers.size) {
+                    const action = msg.action || 'modify'; // Default fallback
+                    const errorMsg = `⚠️ No text selected. Please select text layer(s) to ${action}`;
+                    console.error(errorMsg);
+                    figma.ui.postMessage({
+                        type: 'error',
+                        message: errorMsg
+                    });
+                    figma.notify(errorMsg);
+                    return;
+                }
+
                 let updatedCount = 0;
 
                 // Process each text update
@@ -80,13 +182,21 @@ figma.ui.onmessage = async (msg) => {
                     if (layerInfo && layerInfo.node) {
                         try {
                             const node = layerInfo.node;
-                            // Load fonts
+                            // Load Inter font first
+                            await loadInterFontStyles();
+                            // Then load any other fonts used in the text
                             const fonts = node.getRangeAllFontNames(0, node.characters.length);
                             for (const font of fonts) {
                                 await figma.loadFontAsync(font);
                             }
                             // Update text
                             node.characters = text;
+                            // Set font to Inter if possible
+                            try {
+                                node.fontName = { family: "Inter", style: "Regular" };
+                            } catch (fontError) {
+                                console.warn('Could not apply Inter font:', fontError);
+                            }
                             updatedCount++;
                         } catch (error) {
                             console.error(`Error updating layer ${id}:`, error);
@@ -102,73 +212,133 @@ figma.ui.onmessage = async (msg) => {
             break;
 
         case 'get-language':
-            console.log('Getting saved language');
-            const savedLanguage = await figma.clientStorage.getAsync('targetLanguage');
-            console.log('Saved language:', savedLanguage);
-            figma.ui.postMessage({
-                type: 'set-language',
-                language: savedLanguage || 'es' // Default to Spanish if no language is set
-            });
+            console.log('[get-language] Getting saved language');
+            try {
+                const savedLanguage = await figma.clientStorage.getAsync('targetLanguage');
+                console.log('[get-language] Retrieved language:', savedLanguage);
+                
+                // Always send a value, default to 'es' if none saved
+                const languageToUse = savedLanguage || 'es';
+                console.log('[get-language] Sending language to UI:', languageToUse);
+                
+                figma.ui.postMessage({
+                    type: 'set-language',
+                    language: languageToUse
+                });
+            } catch (error) {
+                console.error('[get-language] Error:', error);
+                figma.notify('Error loading language setting');
+            }
             break;
 
         case 'save-language':
-            console.log('Saving language:', msg.language);
-            await figma.clientStorage.setAsync('targetLanguage', msg.language);
-            // Send confirmation back to UI
-            figma.ui.postMessage({
-                type: 'set-language',
-                language: msg.language
-            });
+            console.log('[save-language] Saving language:', msg.language);
+            try {
+                if (!msg.language) {
+                    console.error('[save-language] No language provided');
+                    return;
+                }
+                await figma.clientStorage.setAsync('targetLanguage', msg.language);
+                console.log('[save-language] Language saved successfully');
+                
+                // Confirm back to UI
+                figma.ui.postMessage({
+                    type: 'set-language',
+                    language: msg.language
+                });
+                figma.notify('Language preference saved');
+            } catch (error) {
+                console.error('[save-language] Error:', error);
+                figma.notify('Error saving language setting');
+            }
             break;
 
         case 'save-brand-guidelines':
             console.log('Saving brand guidelines:', msg.guidelines);
-            await figma.clientStorage.setAsync('brandGuidelines', msg.guidelines);
+            try {
+                await figma.clientStorage.setAsync('brandGuidelines', msg.guidelines);
+                figma.notify('Brand guidelines saved');
+            } catch (error) {
+                console.error('Error saving brand guidelines:', error);
+                figma.notify('Error saving brand guidelines');
+            }
             break;
 
         case 'get-brand-guidelines':
             console.log('Getting saved brand guidelines');
-            const savedGuidelines = await figma.clientStorage.getAsync('brandGuidelines');
-            console.log('Saved guidelines:', savedGuidelines);
-            figma.ui.postMessage({
-                type: 'set-brand-guidelines',
-                guidelines: savedGuidelines || ''
-            });
+            try {
+                const savedGuidelines = await figma.clientStorage.getAsync('brandGuidelines');
+                console.log('Saved guidelines:', savedGuidelines);
+                figma.ui.postMessage({
+                    type: 'set-brand-guidelines',
+                    guidelines: savedGuidelines || ''
+                });
+            } catch (error) {
+                console.error('Error loading brand guidelines:', error);
+                figma.notify('Error loading brand guidelines');
+            }
             break;
 
         case 'save-theme':
             console.log('Saving theme preference:', msg.theme);
-            await figma.clientStorage.setAsync('theme', msg.theme);
+            try {
+                await figma.clientStorage.setAsync('theme', msg.theme);
+                figma.notify('Theme preference saved');
+            } catch (error) {
+                console.error('Error saving theme:', error);
+                figma.notify('Error saving theme preference');
+            }
             break;
 
         case 'get-theme':
             console.log('Getting saved theme');
-            const savedTheme = await figma.clientStorage.getAsync('theme');
-            figma.ui.postMessage({
-                type: 'set-theme',
-                theme: savedTheme || 'system'
-            });
+            try {
+                const savedTheme = await figma.clientStorage.getAsync('theme');
+                figma.ui.postMessage({
+                    type: 'set-theme',
+                    theme: savedTheme || 'system'  // Default to system
+                });
+            } catch (error) {
+                console.error('Error loading theme:', error);
+                figma.notify('Error loading theme preference');
+            }
             break;
 
         case 'apply-text':
             console.log('Applying text changes:', msg.texts);
-            (async () => {  // Wrap in async IIFE
+            if (!selectedTextLayers.size) {
+                const action = msg.action || 'modify'; // Default fallback
+                const errorMsg = `⚠️ No text selected. Please select text layer(s) to ${action}`;
+                console.error(errorMsg);
+                figma.ui.postMessage({
+                    type: 'error',
+                    message: errorMsg
+                });
+                figma.notify(errorMsg);
+                return;
+            }
+
+            (async () => {
                 try {
                     // Process text changes sequentially
                     for (const item of msg.texts) {
                         try {
-                            // Get the node
-                            const node = await figma.getNodeByIdAsync(item.id);
-                            
-                            if (!node || node.type !== "TEXT") {
-                                console.warn(`Node ${item.id} not found or not a text layer`);
+                            // Get the stored node reference
+                            const layerInfo = selectedTextLayers.get(item.id);
+                            if (!layerInfo || !layerInfo.node) {
+                                console.warn(`Node ${item.id} not found in stored layers`);
                                 continue;
                             }
-
-                            // Load the font first
-                            await figma.loadFontAsync(node.fontName);
                             
-                            // Then update the text
+                            const node = layerInfo.node;
+                            
+                            // Load fonts
+                            await Promise.all(
+                                node.getRangeAllFontNames(0, node.characters.length)
+                                    .map(font => figma.loadFontAsync(font))
+                            );
+                            
+                            // Update text
                             node.characters = item.text;
                             console.log(`Successfully updated node ${item.id}`);
                             
@@ -184,7 +354,7 @@ figma.ui.onmessage = async (msg) => {
                     console.error('Error in apply-text:', error);
                     figma.notify('Failed to update some text layers');
                 }
-            })();  // Immediately invoke the async function
+            })();
             break;
     }
 };
