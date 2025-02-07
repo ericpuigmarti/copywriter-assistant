@@ -7,6 +7,7 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 
 ### Added
 - Custom styled dropdown menus for language and theme selectors
+- Feedback link for users to report issues or provide feedback
 
 ### Changed
 - Updated Quality Check feature to show "Coming Soon" instead of "Premium" tag

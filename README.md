@@ -11,6 +11,7 @@ A Figma plugin that helps designers and writers create, translate, and enhance c
 - 🖼️ **Frame Support**: Select entire frames to process multiple text layers at once
 - 🌙 **Dark Mode**: Full dark mode support with system preference detection
 - 🎨 **Style Preservation**: Maintains all Figma text styling during updates
+- 💬 **Quick Feedback**: Built-in feedback form for feature requests and bug reports
 
 ## Planned Enhancements
 - 🔄 Batch processing for multiple frames
