@@ -10,7 +10,7 @@ class Config:
         DEBUG = True
 
     class Production:
-        SERVER_URL = "https://your-production-url.onrender.com"  # You'll update this later
+        SERVER_URL = "https://copywriter-assistant-server.onrender.com/"  # You'll update this later
         DEBUG = False
 
     @staticmethod
