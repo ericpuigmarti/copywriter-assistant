@@ -24,7 +24,10 @@ config = Config.get_config()
 # Configure CORS
 CORS(app, resources={
     r"/*": {
-        "origins": ["*"],
+        "origins": [
+            "https://www.figma.com",
+            "https://figma.com"
+        ],
         "methods": ["POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Accept"]
     }
@@ -95,19 +98,12 @@ def shorten():
 def translate():
     try:
         data = request.json
-        logger.debug(f"Received translation request: {data}")
-        
         text = data.get('text', '')
         target_language = data.get('targetLanguage', '')
         
-        logger.debug(f"Text to translate: {text}")
-        logger.debug(f"Target language: {target_language}")
-        
         if not text or not target_language:
-            logger.error("Missing required fields")
             return jsonify({'error': 'Text and target language are required'}), 400
 
-        logger.debug("Calling OpenAI API...")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -117,12 +113,10 @@ def translate():
         )
         
         translated_text = response.choices[0].message.content.strip()
-        logger.debug(f"Translation result: {translated_text}")
-        
         return jsonify({'translatedText': translated_text})
 
     except Exception as e:
-        logger.error(f"Translation error: {str(e)}", exc_info=True)  # Added exc_info for stack trace
+        logger.error(f"Translation error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # Add this function to load the system prompt
@@ -257,6 +251,10 @@ Remember to respond only in the specified JSON format.
             'error': 'Failed to perform quality check. Please try again.',
             'details': str(e)
         }), 500
+
+@app.route('/')
+def home():
+    return jsonify({'status': 'API is running'})
 
 if __name__ == '__main__':
     logger.info("Starting server...")
