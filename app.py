@@ -29,7 +29,9 @@ CORS(app, resources={
             "https://figma.com"
         ],
         "methods": ["POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Accept"]
+        "allow_headers": ["Content-Type", "Accept"],
+        "expose_headers": ["Access-Control-Allow-Origin"],
+        "supports_credentials": False
     }
 })
 
@@ -255,6 +257,14 @@ Remember to respond only in the specified JSON format.
 @app.route('/')
 def home():
     return jsonify({'status': 'API is running'})
+
+# Also add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://www.figma.com')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Accept')
+    response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+    return response
 
 if __name__ == '__main__':
     logger.info("Starting server...")
