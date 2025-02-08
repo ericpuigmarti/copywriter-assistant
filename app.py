@@ -24,10 +24,7 @@ config = Config.get_config()
 # Configure CORS
 CORS(app, resources={
     r"/*": {
-        "origins": [
-            "https://www.figma.com",
-            "https://figma.com"
-        ],
+        "origins": ["https://www.figma.com"],  # Simplified to just one origin
         "methods": ["POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Accept"],
         "expose_headers": ["Access-Control-Allow-Origin"],
@@ -258,12 +255,14 @@ Remember to respond only in the specified JSON format.
 def home():
     return jsonify({'status': 'API is running'})
 
-# Also add CORS headers to all responses
+# Modify the after_request handler
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'https://www.figma.com')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Accept')
-    response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+    origin = request.headers.get('Origin')
+    if origin == "https://www.figma.com":
+        response.headers['Access-Control-Allow-Origin'] = origin
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Accept'
+    response.headers['Access-Control-Allow-Methods'] = 'POST,OPTIONS'
     return response
 
 if __name__ == '__main__':
