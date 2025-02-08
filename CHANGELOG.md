@@ -307,3 +307,11 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - CORS configuration for local development
 - Environment variable management
 - Proper gitignore setup
+
+## [1.1.1] - 2024-03-27
+### Fixed
+- Resolved CORS issues by updating server configuration
+- Added proper network access in manifest.json
+- Configured correct CORS headers in Flask app
+- Added request origin verification
+- Set up proper Figma domain authorization
