@@ -24,11 +24,12 @@ config = Config.get_config()
 # Configure CORS
 CORS(app, resources={
     r"/*": {
-        "origins": ["https://www.figma.com"],  # Simplified to just one origin
+        "origins": ["https://www.figma.com"],
         "methods": ["POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Accept"],
         "expose_headers": ["Access-Control-Allow-Origin"],
-        "supports_credentials": False
+        "supports_credentials": False,
+        "send_wildcard": False
     }
 })
 
@@ -259,7 +260,7 @@ def home():
 @app.after_request
 def after_request(response):
     origin = request.headers.get('Origin')
-    if origin == "https://www.figma.com":
+    if origin:  # Changed to handle any origin, will be filtered by CORS
         response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Accept'
     response.headers['Access-Control-Allow-Methods'] = 'POST,OPTIONS'
