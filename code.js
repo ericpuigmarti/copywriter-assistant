@@ -292,16 +292,16 @@ figma.ui.onmessage = async (msg) => {
 
         case 'get-theme':
             console.log('Getting saved theme');
-            try {
-                const savedTheme = await figma.clientStorage.getAsync('theme');
+            // Try to get saved theme
+            figma.clientStorage.getAsync('theme').then(savedTheme => {
+                // If no theme is saved, use the default theme from the message
+                const theme = savedTheme || msg.defaultTheme;
+                // Send theme back to UI
                 figma.ui.postMessage({
                     type: 'set-theme',
-                    theme: savedTheme || 'system'  // Default to system
+                    theme: theme
                 });
-            } catch (error) {
-                console.error('Error loading theme:', error);
-                figma.notify('Error loading theme preference');
-            }
+            });
             break;
 
         case 'apply-text':

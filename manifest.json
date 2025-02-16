@@ -1,6 +1,6 @@
 {
     "name": "CopyMate - Smarter, Faster, Better Copywriting",
-    "id": "1443649090446500508",
+    "id": "1469929503876356802",
     "api": "1.0.0",
     "main": "code.js",
     "ui": "ui.html",
@@ -18,7 +18,8 @@
         "https://*.figma.com",
         "https://fonts.googleapis.com",
         "https://fonts.gstatic.com",
-        "https://lottie.host"
+        "https://lottie.host",
+        "https://copywriter-assistant-server.onrender.com"
       ],
       "reasoning": "This plugin uses localhost for development purposes, Figma API access, CDN for loading animations, font services for text rendering, and Lottie host for loading animations"
     }
