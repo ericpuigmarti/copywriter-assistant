@@ -1252,6 +1252,35 @@
             stroke: currentColor;
             stroke-width: 2;
         }
+
+        /* Add this style for the outlined button */
+        .action-btn.outlined {
+            background-color: transparent;
+            border: 1.5px solid var(--text-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 200ms ease;
+            margin-bottom: 8px;  /* Add space between buttons */
+        }
+
+        .action-btn.outlined:hover {
+            background-color: var(--button-hover);
+        }
+
+        .action-btn.outlined svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
     </style>
 </head>
 <body>
@@ -1377,12 +1406,20 @@
                 </div>
                 
                 <div class="apply-button-container">
+                    <button id="tryAgainButton" class="action-btn outlined">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Try Again
+                    </button>
                     <button id="applyToFigma" class="action-btn primary">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
                             <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                            Apply to Figma
-                        </button>
+                        Apply to Figma
+                    </button>
                 </div>
             </div>
             <div id="qualityCheckResults" class="quality-results" style="display: none;">
@@ -1557,6 +1594,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="settings-section">
+            <h4 class="settings-section-title">About</h4>
+            <div class="setting-item">
+                <div class="setting-content">
+                    <div class="setting-title">Version</div>
+                    <div class="setting-description">0.3.3</div>
+                </div>
+            </div>
+            <!-- ... rest of settings content ... -->
+        </div>
     </div>
 
     <!-- Add Lottie script with load event listener -->
@@ -1611,73 +1659,50 @@
 
         // API call handler
         async function handleAPICall(endpoint, data) {
-            loadingIndicator.style.display = 'flex';
-            resultsView.style.display = 'none';
-            textEditor.style.display = 'none';
-            document.querySelector('.action-panel').style.display = 'none';
-            document.querySelector('.section-title').style.display = 'none';
+            console.log('[API Call] Starting:', endpoint);
             
             try {
-                // Process each text separately while maintaining the mapping
-                const processedTexts = [];
-                for (const [id, originalText] of selectedTexts.entries()) {
-                    const response = await callAPI(endpoint, {
-                        ...data,
-                        text: originalText
-                    });
-                    
-                    // Get the processed text based on endpoint
-                    const processedText = response.translatedText || response.enhancedText || response.shortenedText;
-                    
-                    processedTexts.push({
-                        id,
-                        original: originalText,
-                        processed: processedText
-                    });
-                }
+                // Show loading state
+                loadingIndicator.style.display = 'flex';
+                textEditor.style.display = 'none';
+                document.querySelector('.action-panel').style.display = 'none';
+
+                const response = await callAPI(endpoint, data);
                 
-                // Display results
-                const originalTextDiv = document.getElementById('originalText');
-                const processedTextDiv = document.getElementById('processedText');
+                // Get the processed text based on endpoint
+                const processedText = endpoint === 'translate' ? response.translatedText :
+                                    endpoint === 'shorten' ? response.shortenedText :
+                                    response.enhancedText;
+
+                // Create arrays for original and processed text
+                const originalText = [textEditor.value];
+                const processedTexts = [{
+                    id: 'preview',
+                    text: processedText
+                }];
+
+                // Show results with the correct operation type
+                showResults(originalText, processedTexts, endpoint);
                 
-                // Clear previous content
-                originalTextDiv.innerHTML = '';
-                processedTextDiv.innerHTML = '';
+                // Store for apply to Figma
+                currentProcessedTexts = processedTexts;
                 
-                // Display each text pair
-                processedTexts.forEach(({ original, processed }, index) => {
-                    if (index > 0) {
-                        // Add separator between multiple texts
-                        originalTextDiv.appendChild(document.createElement('hr'));
-                        processedTextDiv.appendChild(document.createElement('hr'));
-                    }
-                    
-                    const originalP = document.createElement('p');
-                    originalP.textContent = original;
-                    originalTextDiv.appendChild(originalP);
-                    
-                    const processedP = document.createElement('p');
-                    processedP.textContent = processed;
-                    processedTextDiv.appendChild(processedP);
-                });
-                
-                // Store processed texts with their IDs for applying back to Figma
-                currentProcessedTexts = processedTexts.map(({ id, processed }) => ({
-                    id,
-                    text: processed
-                }));
-                
+                // Hide loading, show results
                 loadingIndicator.style.display = 'none';
-                showResults();
+                resultsView.style.display = 'block';
+                
             } catch (error) {
+                console.error(`[${endpoint}] Error:`, error);
                 loadingIndicator.style.display = 'none';
-                showEditor();
-                alert(`${endpoint} failed. Please try again. ` + error.message);
+                textEditor.style.display = 'block';
+                document.querySelector('.action-panel').style.display = 'flex';
+                alert(`${endpoint} failed. Please try again.`);
             }
         }
 
         // Update button handlers to use the new handleAPICall function
         translateButton.addEventListener('click', async () => {
+            console.log('[Action] Starting translation process');
             if (!textEditor.value.trim()) return;
             await handleAPICall('translate', {
                 text: textEditor.value,
@@ -1686,6 +1711,7 @@
         });
 
         enhanceButton.addEventListener('click', async () => {
+            console.log('[Action] Starting enhancement process');
             if (!textEditor.value.trim()) return;
             await handleAPICall('enhance', {
                 text: textEditor.value
@@ -1693,14 +1719,65 @@
         });
 
         shortenButton.addEventListener('click', async () => {
+            console.log('[Action] Starting shortening process');
             if (!textEditor.value.trim()) return;
-            await handleAPICall('shorten', {
-                text: textEditor.value
-            });
+            
+            try {
+                // Show loading state
+                loadingIndicator.style.display = 'flex';
+                textEditor.style.display = 'none';
+                document.querySelector('.action-panel').style.display = 'none';
+                
+                const response = await callAPI('shorten', {
+                    text: textEditor.value
+                });
+                
+                console.log('[Shorten] Response:', response);
+                
+                // Update results view
+                const originalTextDiv = document.getElementById('originalText');
+                const processedTextDiv = document.getElementById('processedText');
+                
+                // Clear previous content
+                originalTextDiv.innerHTML = '';
+                processedTextDiv.innerHTML = '';
+                
+                // Add new content
+                const originalP = document.createElement('p');
+                originalP.textContent = textEditor.value;
+                originalTextDiv.appendChild(originalP);
+                
+                const processedP = document.createElement('p');
+                processedP.textContent = response.shortenedText;
+                processedTextDiv.appendChild(processedP);
+                
+                // Update header
+                document.querySelectorAll('.results-column-header h3')[1].textContent = 'Shortened Text';
+                
+                // Hide loading, show results
+                loadingIndicator.style.display = 'none';
+                resultsView.style.display = 'block';
+                
+                // Store for apply to Figma
+                currentProcessedTexts = [{
+                    id: 'preview',
+                    text: response.shortenedText
+                }];
+                
+            } catch (error) {
+                console.error('[Shorten] Error:', error);
+                loadingIndicator.style.display = 'none';
+                textEditor.style.display = 'block';
+                document.querySelector('.action-panel').style.display = 'flex';
+                alert('Failed to shorten text. Please try again.');
+            }
         });
 
         // Helper function for API calls
         async function callAPI(endpoint, data) {
+            console.log('[API Call] Endpoint:', endpoint);
+            console.log('[API Call] Data:', data);
+            
             try {
                 // Replace localhost:5000 with Render URL
                 const response = await fetch(`https://copywriter-assistant-server.onrender.com/${endpoint}`, {
@@ -1717,7 +1794,9 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                return await response.json();
+                const result = await response.json();
+                console.log('[API Response]:', result);
+                return result;
             } catch (error) {
                 console.error(`${endpoint} error:`, error);
                 throw error;
@@ -1725,7 +1804,7 @@
         }
 
         // Update the message handler to trigger button state update
-        window.onmessage = (event) => {
+        window.onmessage = async (event) => {
             const msg = event.data.pluginMessage;
             if (!msg) return;
 
@@ -1767,6 +1846,38 @@
                     if (msg.theme) {
                         setTheme(msg.theme);
                         themeSelect.value = msg.theme;
+                    }
+                    break;
+
+                case 'process-retry':
+                    console.log('[Process Retry] Starting:', msg);
+                    try {
+                        // Call API with correct operation
+                        const response = await callAPI(msg.operation, {
+                            text: msg.texts[0].text,
+                            targetLanguage: msg.params.targetLanguage
+                        });
+                        
+                        // Get the correct response property based on operation
+                        const processedText = msg.operation === 'translate' ? response.translatedText :
+                                            msg.operation === 'shorten' ? response.shortenedText :
+                                            response.enhancedText;
+                        
+                        // Show results with correct operation type
+                        showResults(
+                            [msg.texts[0].text], 
+                            [{ id: msg.texts[0].id, text: processedText }],
+                            msg.operation
+                        );
+                        
+                        // Hide loading, show results
+                        loadingIndicator.style.display = 'none';
+                        resultsView.style.display = 'block';
+                        
+                    } catch (error) {
+                        console.error('[Process Retry] Error:', error);
+                        loadingIndicator.style.display = 'none';
+                        alert('Failed to process text. Please try again.');
                     }
                     break;
             }
@@ -2050,6 +2161,121 @@
             initializeCustomSelects();
             // ... your other initialization code ...
         });
+
+        // Add this to your existing script section, after the other button handlers
+        const tryAgainButton = document.getElementById('tryAgainButton');
+
+        tryAgainButton.addEventListener('click', () => {
+            console.log('[Retry] Button clicked');
+            
+            // Get current operation from the second column header
+            const headerText = document.querySelectorAll('.results-column-header h3')[1].textContent;
+            console.log('[Retry] Header text:', headerText);
+            
+            // Fix the operation detection logic
+            let currentOperation;
+            switch (headerText) {
+                case 'Translated Text':
+                    currentOperation = 'translate';
+                    break;
+                case 'Shortened Text':
+                    currentOperation = 'shorten';
+                    break;
+                case 'Enhanced Text':
+                    currentOperation = 'enhance';
+                    break;
+                default:
+                    console.error('[Retry] Unknown operation from header:', headerText);
+                    return;
+            }
+            
+            console.log('[Retry] Using operation:', currentOperation);
+            
+            // Show loading state
+            loadingIndicator.style.display = 'flex';
+            resultsView.style.display = 'none';
+            
+            // Send message to code.js
+            parent.postMessage({
+                pluginMessage: {
+                    type: 'retry-text',
+                    operation: currentOperation,
+                    targetLanguage: targetLanguageSelect.value
+                }
+            }, '*');
+        });
+
+        // Update the back button handler
+        backToEditButton.addEventListener('click', () => {
+            console.log('[Back] Returning to editor view');
+            
+            // Hide results view
+            resultsView.style.display = 'none';
+            
+            // Show editor and action panel
+            textEditor.style.display = 'block';
+            document.querySelector('.action-panel').style.display = 'flex';
+            
+            // Clear the results content
+            document.getElementById('originalText').innerHTML = '';
+            document.getElementById('processedText').innerHTML = '';
+            
+            // Reset any loading states
+            loadingIndicator.style.display = 'none';
+            
+            // Update button states
+            updateButtonStates();
+        });
+
+        // Update the showResults function to ensure proper view state
+        function showResults(originalTexts, processedTexts, operation) {
+            console.log('[Results] Showing results view');
+            
+            // Hide editor and action panel
+            textEditor.style.display = 'none';
+            document.querySelector('.action-panel').style.display = 'none';
+            
+            // Show results container
+            resultsView.style.display = 'block';
+            
+            // Set the correct header text based on operation
+            const processedHeader = document.querySelectorAll('.results-column-header h3')[1];
+            switch (operation) {
+                case 'translate':
+                    processedHeader.textContent = 'Translated Text';
+                    break;
+                case 'shorten':
+                    processedHeader.textContent = 'Shortened Text';
+                    break;
+                case 'enhance':
+                    processedHeader.textContent = 'Enhanced Text';
+                    break;
+            }
+            
+            // Update the results content
+            const originalTextDiv = document.getElementById('originalText');
+            const processedTextDiv = document.getElementById('processedText');
+            
+            // Clear previous content
+            originalTextDiv.innerHTML = '';
+            processedTextDiv.innerHTML = '';
+            
+            // Add new content
+            originalTexts.forEach((text, index) => {
+                if (index > 0) {
+                    originalTextDiv.appendChild(document.createElement('hr'));
+                    processedTextDiv.appendChild(document.createElement('hr'));
+                }
+                
+                const originalP = document.createElement('p');
+                originalP.textContent = text;
+                originalTextDiv.appendChild(originalP);
+                
+                const processedP = document.createElement('p');
+                processedP.textContent = processedTexts[index].text;
+                processedTextDiv.appendChild(processedP);
+            });
+        }
     </script>
 </body>
 </html>
