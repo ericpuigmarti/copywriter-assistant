@@ -6,6 +6,7 @@ A Figma plugin that helps designers and writers create, translate, and enhance c
 - 🌐 **Text Translation**: Convert text to multiple languages while preserving formatting
 - ✨ **Text Enhancement**: Improve writing quality and clarity with AI suggestions
 - 📝 **Text Shortening**: Create concise versions of your text while maintaining meaning
+- 🔄 **Try Again**: Regenerate AI responses while maintaining all settings and preferences
 - 🎯 **Quality Check**: Analyze and score your copy across multiple criteria (Premium)
 - 🎨 **Brand Guidelines**: Ensure text aligns with your brand voice (Premium)
 - 🖼️ **Frame Support**: Select entire frames to process multiple text layers at once

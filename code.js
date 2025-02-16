@@ -64,6 +64,12 @@ initializeSettings();
 // Add a global variable to store text mappings
 let selectedTextLayers = new Map();
 
+// Add a variable to store the last used operation and its parameters
+let lastOperation = {
+    type: null,  // 'translate', 'enhance', or 'shorten'
+    params: {}   // Store all parameters used
+};
+
 // Add this helper function to recursively find text layers
 function findTextLayers(node, textLayers = []) {
     // Check if node is a text layer
@@ -151,7 +157,8 @@ figma.on('selectionchange', () => {
 
 // Handle messages from UI
 figma.ui.onmessage = async (msg) => {
-    console.log('Message received from UI:', msg);
+    console.log('[Message] Type:', msg.type);
+    console.log('[Message] Full data:', msg);
 
     switch (msg.type) {
         case 'get-selected-text':
@@ -160,8 +167,17 @@ figma.ui.onmessage = async (msg) => {
             break;
 
         case 'update-text':
-            console.log('Received update-text request:', msg.processedTexts);
+            console.log('[Process] Starting text update with operation:', msg.operation);
             try {
+                // Store the operation details for retry
+                lastOperation = {
+                    type: msg.operation,
+                    params: {
+                        targetLanguage: msg.targetLanguage,
+                        brandGuidelines: msg.brandGuidelines
+                    }
+                };
+                console.log('[Process] Stored operation:', lastOperation);
                 if (!selectedTextLayers.size) {
                     const action = msg.action || 'modify'; // Default fallback
                     const errorMsg = `⚠️ No text selected. Please select text layer(s) to ${action}`;
@@ -206,7 +222,7 @@ figma.ui.onmessage = async (msg) => {
 
                 figma.notify(`Updated ${updatedCount} text layer${updatedCount > 1 ? 's' : ''}`);
             } catch (error) {
-                console.error('Error in update-text handler:', error);
+                console.error('[Error] Update text:', error);
                 figma.notify('Error: ' + error.message);
             }
             break;
@@ -292,16 +308,16 @@ figma.ui.onmessage = async (msg) => {
 
         case 'get-theme':
             console.log('Getting saved theme');
-            try {
-                const savedTheme = await figma.clientStorage.getAsync('theme');
+            // Try to get saved theme
+            figma.clientStorage.getAsync('theme').then(savedTheme => {
+                // If no theme is saved, use the default theme from the message
+                const theme = savedTheme || msg.defaultTheme;
+                // Send theme back to UI
                 figma.ui.postMessage({
                     type: 'set-theme',
-                    theme: savedTheme || 'system'  // Default to system
+                    theme: theme
                 });
-            } catch (error) {
-                console.error('Error loading theme:', error);
-                figma.notify('Error loading theme preference');
-            }
+            });
             break;
 
         case 'apply-text':
@@ -355,6 +371,37 @@ figma.ui.onmessage = async (msg) => {
                     figma.notify('Failed to update some text layers');
                 }
             })();
+            break;
+
+        case 'retry-text':
+            console.log('[Retry] Starting retry with operation:', msg.operation);
+            try {
+                if (!selectedTextLayers.size) {
+                    const errorMsg = "⚠️ No text selected. Please select text layer(s) to retry";
+                    console.error(errorMsg);
+                    figma.notify(errorMsg);
+                    return;
+                }
+
+                console.log('[Retry] Previous operation was:', lastOperation.type);
+                console.log('[Retry] Requested operation is:', msg.operation);
+                console.log('[Retry] Using parameters:', lastOperation.params);
+
+                // Send back to UI for processing
+                figma.ui.postMessage({
+                    type: 'process-retry',
+                    operation: msg.operation,  // Use the operation from the retry request
+                    params: lastOperation.params,
+                    texts: Array.from(selectedTextLayers.entries()).map(([id, info]) => ({
+                        id,
+                        text: info.text
+                    }))
+                });
+
+            } catch (error) {
+                console.error('Error in retry-text handler:', error);
+                figma.notify('Error: ' + error.message);
+            }
             break;
     }
 };

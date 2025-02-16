@@ -3,6 +3,39 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.3] - 2024-03-27
+### Added
+- "Try Again" button in results view to regenerate AI responses
+- Support for retrying translations, enhancements, and shortened text
+- Preserves all operation parameters (language, guidelines) during retry
+
+### Fixed
+- Operation type detection in results view
+- Loading states during retry operations
+- Header text consistency for different operations
+- Back button functionality in results view
+- Results view display after API response
+- Error handling for forEach undefined in results display
+
+## [0.3.2] - 2024-03-27
+### Changed
+- Renamed server.py to app.py for better code organization
+- Updated API endpoint URL from localhost to production server
+- Improved server code structure and configuration
+- Removed logo header due to rendering issues
+- Set dark theme as default for new users while preserving existing user preferences
+### Fixed
+- Added production server domain to manifest.json allowedDomains
+- Fixed Content Security Policy violation errors
+
+## [0.3.1] - 2024-03-27
+### Fixed
+- Resolved CORS issues by updating server configuration
+- Added proper network access in manifest.json
+- Configured correct CORS headers in Flask app
+- Added request origin verification
+- Set up proper Figma domain authorization
+
 ## [0.3.0] - 2024-01-25
 
 ### Added
