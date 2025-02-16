@@ -403,6 +403,47 @@ figma.ui.onmessage = async (msg) => {
                 figma.notify('Error: ' + error.message);
             }
             break;
+
+        case 'process-retry':
+            console.log('[Process Retry] Starting:', msg);
+            try {
+                // Call API with correct operation
+                const response = await callAPI(msg.operation, {
+                    text: msg.texts[0].text,
+                    targetLanguage: msg.params.targetLanguage
+                });
+                
+                // Get the correct response property based on operation
+                const processedText = msg.operation === 'translate' ? response.translatedText :
+                                    msg.operation === 'shorten' ? response.shortenedText :
+                                    response.enhancedText;
+                
+                // Maintain the original ID from the Figma layer
+                const processedTexts = [{
+                    id: msg.texts[0].id,  // Keep the original Figma layer ID
+                    text: processedText
+                }];
+
+                // Show results with correct operation type
+                showResults(
+                    [msg.texts[0].text], 
+                    processedTexts,
+                    msg.operation
+                );
+                
+                // Store for apply to Figma - use the same ID structure
+                currentProcessedTexts = processedTexts;
+                
+                // Hide loading, show results
+                loadingIndicator.style.display = 'none';
+                resultsView.style.display = 'block';
+                
+            } catch (error) {
+                console.error('[Process Retry] Error:', error);
+                loadingIndicator.style.display = 'none';
+                alert('Failed to process text. Please try again.');
+            }
+            break;
     }
 };
 

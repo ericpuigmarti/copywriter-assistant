@@ -3,6 +3,11 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.4] - 2024-03-27
+### Changed
+- Updated settings modal styling to match app design
+- Improved version display consistency
+
 ## [0.3.3] - 2024-03-27
 ### Added
 - "Try Again" button in results view to regenerate AI responses
