@@ -9,6 +9,7 @@ import re
 import json
 from pathlib import Path
 import random
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -96,6 +97,7 @@ def shorten():
 
 @app.route('/translate', methods=['POST'])
 def translate():
+    start_time = time.time()
     try:
         data = request.json
         text = data.get('text', '')
@@ -104,6 +106,8 @@ def translate():
         if not text or not target_language:
             return jsonify({'error': 'Text and target language are required'}), 400
 
+        # Log API call start
+        api_start = time.time()
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -111,8 +115,19 @@ def translate():
                 {"role": "user", "content": f"Translate this text to {target_language}:\n\n{text}"}
             ]
         )
+        api_duration = time.time() - api_start
         
         translated_text = response.choices[0].message.content.strip()
+        total_duration = time.time() - start_time
+        
+        logger.info(f"""
+        Translation Performance Metrics:
+        - Total time: {total_duration:.2f}s
+        - OpenAI API time: {api_duration:.2f}s
+        - Server processing time: {(total_duration - api_duration):.2f}s
+        - Text length: {len(text)} chars
+        """)
+        
         return jsonify({'translatedText': translated_text})
 
     except Exception as e:

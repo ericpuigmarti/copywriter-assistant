@@ -7,6 +7,7 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 ### Changed
 - Updated settings modal styling to match app design
 - Improved version display consistency
+- Added performance logging for API calls
 
 ## [0.3.3] - 2024-03-27
 ### Added
