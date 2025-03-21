@@ -1674,14 +1674,15 @@
                                     response.enhancedText;
 
                 // Create arrays for original and processed text
-                const originalText = [textEditor.value];
-                const processedTexts = [{
-                    id: 'preview',
+                // Use the stored selectedTexts Map to maintain text IDs
+                const originalTexts = Array.from(selectedTexts.entries()).map(([id, text]) => text);
+                const processedTexts = Array.from(selectedTexts.keys()).map(id => ({
+                    id: id,
                     text: processedText
-                }];
+                }));
 
                 // Show results with the correct operation type
-                showResults(originalText, processedTexts, endpoint);
+                showResults(originalTexts, processedTexts, endpoint);
                 
                 // Store for apply to Figma
                 currentProcessedTexts = processedTexts;
@@ -1757,11 +1758,11 @@
                 loadingIndicator.style.display = 'none';
                 resultsView.style.display = 'block';
                 
-                // Store for apply to Figma
-                currentProcessedTexts = [{
-                    id: 'preview',
+                // Store for apply to Figma - use the stored selectedTexts Map
+                currentProcessedTexts = Array.from(selectedTexts.keys()).map(id => ({
+                    id: id,
                     text: response.shortenedText
-                }];
+                }));
                 
             } catch (error) {
                 console.error('[Shorten] Error:', error);
