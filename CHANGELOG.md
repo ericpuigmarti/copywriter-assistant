@@ -3,6 +3,15 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.5] - 2024-03-27
+### Added
+- Warning notification when selecting hidden layers to improve user experience
+
+### Changed
+- Improved text layer visibility detection to only process visible layers on canvas
+- Fixed visibility checking to properly handle nested layer structures
+- Optimized frame selection to ignore hidden text layers
+
 ## [0.3.4] - 2024-03-27
 ### Changed
 - Updated settings modal styling to match app design

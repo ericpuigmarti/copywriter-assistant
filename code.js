@@ -1,5 +1,9 @@
-// Show the UI
+// Add more detailed logging at plugin start
+console.log('Plugin starting...');
+
+// Show the UI with debug info
 figma.showUI(__html__, { width: 400, height: 640 });
+console.log('UI shown');
 
 // Add these font loading functions at the top of the file
 async function loadInterFontStyles() {
@@ -70,78 +74,95 @@ let lastOperation = {
     params: {}   // Store all parameters used
 };
 
-// Add this helper function to recursively find text layers
+// Helper function to check if node is a frame or page
+function isContainerNode(node) {
+    return node.type === 'FRAME' || node.type === 'PAGE';
+}
+
+// Modified visibility check to properly handle layer visibility
+function isNodeTrulyVisible(node) {
+    if (!node.visible) return false;
+    let parent = node.parent;
+    while (parent && parent.type !== 'PAGE') {
+        if (!parent.visible) return false;
+        parent = parent.parent;
+    }
+    return true;
+}
+
+// Revised findTextLayers function with stricter visibility checking
 function findTextLayers(node, textLayers = []) {
-    // Check if node is a text layer
-    if (node.type === "TEXT") {
+    if (!isNodeTrulyVisible(node)) return textLayers;
+
+    if (node.type === 'TEXT' && node.visible) {
         textLayers.push({
             id: node.id,
-            text: node.characters,
-            node: node  // Store reference to the node for later use
+            text: node.characters
         });
-    }
-    // If node has children (like a frame or group), traverse them
-    else if ("children" in node) {
-        for (const child of node.children) {
-            findTextLayers(child, textLayers);
-        }
+    } else if ('children' in node) {
+        node.children.forEach(child => findTextLayers(child, textLayers));
     }
     return textLayers;
 }
 
-// Function to handle text extraction
+// Simplified handleSelection function
 function handleSelection() {
-    console.log('handleSelection called');
     const selection = figma.currentPage.selection;
-    console.log('Current selection:', selection);
     
-    if (selection.length > 0) {
-        let allTextLayers = [];
-        selectedTextLayers.clear();
-        
-        // Process each selected node
-        for (const node of selection) {
-            // Find all text layers in this node (or its children)
-            const textLayers = findTextLayers(node);
-            allTextLayers = allTextLayers.concat(textLayers);
-        }
-        
-        // Send extracted text to UI
-        if (allTextLayers.length > 0) {
-            console.log('Text layers found:', allTextLayers);
-            allTextLayers.forEach(item => {
-                selectedTextLayers.set(item.id, {
-                    text: item.text,
-                    node: item.node
-                });
-            });
-            
-            // Send only necessary data to UI
-            const textsForUI = allTextLayers.map(({ id, text }) => ({ id, text }));
-            figma.ui.postMessage({
-                type: 'selected-text',
-                texts: textsForUI,
-                hasContent: true
-            });
-        } else {
-            console.log('No text layers found in selection');
-            figma.ui.postMessage({
-                type: 'selected-text',
-                texts: [],
-                hasContent: false,
-                error: 'No text layers in selection'
-            });
-            figma.notify('⚠️ Please select text layer(s) to work with');
-        }
-    } else {
-        console.log('No selection');
+    if (selection.length === 0) {
         figma.ui.postMessage({
             type: 'selected-text',
             texts: [],
-            hasContent: false,
-            error: 'Nothing selected'
+            hasContent: false
         });
-        figma.notify('⚠️ Please select text layer(s) to work with');
+        return;
+    }
+
+    let allTextLayers = [];
+    selectedTextLayers.clear();
+    
+    // Process each selected node
+    for (const node of selection) {
+        // If it's a text layer itself
+        if (node.type === "TEXT" && isNodeTrulyVisible(node)) {
+            allTextLayers.push({
+                id: node.id,
+                text: node.characters,
+                node: node
+            });
+        }
+        // If it's a container (including instances)
+        else if ("children" in node) {
+            const foundLayers = findTextLayers(node, []);
+            allTextLayers = allTextLayers.concat(foundLayers);
+        }
+    }
+    
+    // Send results to UI
+    if (allTextLayers.length > 0) {
+        console.log(`Found ${allTextLayers.length} visible text layers`);
+        
+        // Store in the map
+        allTextLayers.forEach(layer => {
+            selectedTextLayers.set(layer.id, {
+                text: layer.text,
+                node: layer.node
+            });
+        });
+        
+        // Send to UI
+        const textsForUI = allTextLayers.map(({ id, text }) => ({ id, text }));
+        figma.ui.postMessage({
+            type: 'selected-text',
+            texts: textsForUI,
+            hasContent: true
+        });
+    } else {
+        figma.ui.postMessage({
+            type: 'selected-text',
+            texts: [],
+            hasContent: false
+        });
     }
 }
 
@@ -149,10 +170,38 @@ function handleSelection() {
 console.log('Running initial selection check');
 handleSelection();
 
-// Listen for selection changes
+// Add error handling to the selection change listener
 figma.on('selectionchange', () => {
-    console.log('Selection changed');
-    handleSelection();
+    const selection = figma.currentPage.selection;
+    
+    // Check if we have a single selected item that's hidden
+    if (selection.length === 1 && !isNodeTrulyVisible(selection[0])) {
+        figma.notify("⚠️ Selected layer is hidden. The plugin will only work with visible layers.", {
+            timeout: 5000,
+            error: true
+        });
+        return;
+    }
+
+    // Process visible text layers
+    const textLayers = [];
+    selection.forEach(node => {
+        if (node.type === 'TEXT' && isNodeTrulyVisible(node)) {
+            textLayers.push({
+                id: node.id,
+                text: node.characters
+            });
+        } else {
+            // For frames and other container types, find visible text layers within
+            findTextLayers(node, textLayers);
+        }
+    });
+
+    // Send text layers to UI
+    figma.ui.postMessage({
+        type: 'selected-text',
+        texts: textLayers
+    });
 });
 
 // Handle messages from UI
