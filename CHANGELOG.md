@@ -3,6 +3,13 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.8] - 2024-03-27
+### Fixed
+- Fixed "Apply to Figma" button not working for enhancement operations
+- Added validation and error handling for empty processed texts
+- Added logging to help diagnose apply functionality issues
+- Fixed event tracking order in handleAPICall function
+
 ## [0.3.7] - 2024-03-27
 ### Fixed
 - Fixed footer section overlapping with main buttons in results view

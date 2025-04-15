@@ -136,10 +136,13 @@ function handleSelection() {
         // If it's a container (including instances)
         else if ("children" in node) {
             const foundLayers = findTextLayers(node, []);
-            allTextLayers = allTextLayers.concat(foundLayers.map(layer => ({
-                ...layer,
-                node: figma.getNodeById(layer.id) // Store the node reference
-            })));
+            foundLayers.forEach(layer => {
+                allTextLayers.push({
+                    id: layer.id,
+                    text: layer.text,
+                    node: figma.getNodeById(layer.id) // Store the node reference
+                });
+            });
         }
     }
     
