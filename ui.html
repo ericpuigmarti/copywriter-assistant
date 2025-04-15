@@ -82,15 +82,15 @@
         }
 
         body {
-            /* Update the body font-family */
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             width: 400px;
             height: 600px;
-            overflow: hidden;
+            overflow: visible;
             background-color: var(--background-color);
             color: var(--text-color);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            border-radius: 8px;
         }
 
         /* Ensure consistent font rendering */
@@ -103,12 +103,15 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            border-radius: 8px; /* Add border radius */
+            overflow: visible; /* Change from hidden to visible */
         }
 
         main {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            border-radius: 8px; /* Add border radius */
         }
 
         /* Typography */
@@ -402,7 +405,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+            /* Remove the box-shadow that might be causing the issue */
+            box-shadow: none;
         }
 
         .text-button:hover {
@@ -918,6 +922,9 @@
             right: 16px;
             z-index: 100;
             transition: opacity 200ms ease;
+            background-color: var(--background-color); /* Match the background */
+            border-radius: 8px; /* Add border radius to match UI */
+            padding: 8px; /* Add some padding */
         }
 
         .settings-button-container.hidden {
@@ -1281,7 +1288,37 @@
             stroke: currentColor;
             stroke-width: 2;
         }
+
+        /* Add styles for the container's inner div */
+        .settings-button-container > div {
+            background-color: var(--background-color);
+            border-radius: 8px;
+            padding: 4px;
+        }
     </style>
+
+    <!-- Add this in the head section -->
+    <script>
+    (function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+    for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}var d={},e="get_group";for(h=0;h<j.length;h++)b(j[h]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+    </script>
+
+    <!-- Initialize Mixpanel -->
+    <script>
+        // Initialize with your project token
+        mixpanel.init('c82fa745ac9100cd811c50438d0353d3', {
+            debug: true,
+            track_pageview: true,
+            persistence: 'localStorage'
+        });
+
+        // Add this line to verify initialization
+        console.log('Mixpanel initialized:', mixpanel);
+
+        // Track plugin load
+        mixpanel.track('Plugin Loaded');
+        console.log('Sent Plugin Loaded event');
+    </script>
 </head>
 <body>
     <div class="container">
@@ -1510,7 +1547,7 @@
         <!-- Add settings button container -->
         <div class="settings-button-container">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.4</span>
+                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.5</span>
                 <a href="https://tally.so/r/3yoGEB" target="_blank" class="feedback-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -1659,6 +1696,7 @@
         // API call handler
         async function handleAPICall(endpoint, data) {
             console.log('[API Call] Starting:', endpoint);
+            const startTime = performance.now();
             
             try {
                 // Show loading state
@@ -1667,6 +1705,13 @@
                 document.querySelector('.action-panel').style.display = 'none';
 
                 const response = await callAPI(endpoint, data);
+                
+                // Track success
+                trackEvent(`${endpoint} Completed`, {
+                    textLength: data.text?.length || 0,
+                    duration: performance.now() - startTime,
+                    targetLanguage: data.targetLanguage || null
+                });
                 
                 // Get the processed text based on endpoint
                 const processedText = endpoint === 'translate' ? response.translatedText :
@@ -1692,6 +1737,14 @@
                 resultsView.style.display = 'block';
                 
             } catch (error) {
+                // Track failure
+                trackEvent(`${endpoint} Failed`, {
+                    error: error.message,
+                    textLength: data.text?.length || 0,
+                    duration: performance.now() - startTime,
+                    targetLanguage: data.targetLanguage || null
+                });
+                
                 console.error(`[${endpoint}] Error:`, error);
                 loadingIndicator.style.display = 'none';
                 textEditor.style.display = 'block';
@@ -1703,6 +1756,12 @@
         // Update button handlers to use the new handleAPICall function
         translateButton.addEventListener('click', async () => {
             console.log('[Action] Starting translation process');
+            // Add tracking
+            trackEvent('Translation Started', {
+                textLength: textEditor.value.length,
+                targetLanguage: targetLanguageSelect.value
+            });
+            
             if (!textEditor.value.trim()) return;
             await handleAPICall('translate', {
                 text: textEditor.value,
@@ -1712,6 +1771,11 @@
 
         enhanceButton.addEventListener('click', async () => {
             console.log('[Action] Starting enhancement process');
+            // Add tracking
+            trackEvent('Enhancement Started', {
+                textLength: textEditor.value.length
+            });
+            
             if (!textEditor.value.trim()) return;
             await handleAPICall('enhance', {
                 text: textEditor.value
@@ -1720,6 +1784,11 @@
 
         shortenButton.addEventListener('click', async () => {
             console.log('[Action] Starting shortening process');
+            // Add tracking
+            trackEvent('Shorten Started', {
+                textLength: textEditor.value.length
+            });
+            
             if (!textEditor.value.trim()) return;
             
             try {
@@ -1919,6 +1988,8 @@
 
         // Settings modal functionality
         settingsButton.addEventListener('click', () => {
+            trackEvent('Settings Opened');
+            console.log('Sent Settings Opened event');  // Add debug log
             settingsModal.classList.add('visible');
         });
 
@@ -1946,6 +2017,11 @@
             // Set new timeout to save after user stops typing
             saveTimeout = setTimeout(async () => {
                 try {
+                    trackEvent('Brand Guidelines Updated', {
+                        hasGuidelines: brandGuidelinesInput.value.length > 0,
+                        guidelinesLength: brandGuidelinesInput.value.length
+                    });
+                    
                     // Send to parent (Figma)
             parent.postMessage({
                 pluginMessage: {
@@ -1970,6 +2046,11 @@
 
         // Add apply to Figma handler
         applyToFigmaButton.addEventListener('click', () => {
+            trackEvent('Apply to Figma', {
+                textCount: currentProcessedTexts.length,
+                totalCharacters: currentProcessedTexts.reduce((sum, text) => sum + text.text.length, 0)
+            });
+            
             // Send processed texts back to Figma
             parent.postMessage({
                 pluginMessage: {
@@ -2085,6 +2166,10 @@
         targetLanguageSelect.addEventListener('change', (e) => {
             const selectedLanguage = e.target.value;
             console.log('Language changed to:', selectedLanguage);
+            
+            trackEvent('Language Changed', {
+                language: selectedLanguage
+            });
             
             // Save language preference to Figma storage
             parent.postMessage({
@@ -2277,6 +2362,124 @@
                 processedTextDiv.appendChild(processedP);
             });
         }
+    </script>
+
+    <script>
+        // Replace the existing trackEvent function with this simplified version
+        function trackEvent(eventName, properties = {}) {
+            try {
+                console.log(`Attempting to track event: ${eventName}`, properties);
+                
+                // Encode data for Mixpanel
+                const data = {
+                    event: eventName,
+                    properties: {
+                        ...properties,
+                        token: 'c82fa745ac9100cd811c50438d0353d3',
+                        time: Math.round(new Date().getTime() / 1000),
+                        distinct_id: 'plugin_user' // Add a default distinct_id
+                    }
+                };
+
+                // Base64 encode the data
+                const encodedData = btoa(JSON.stringify(data));
+
+                // Send to Mixpanel using fetch with correct headers
+                fetch('https://api.mixpanel.com/track', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'text/plain',  // Change content-type to accept
+                        'Content-Type': 'application/x-www-form-urlencoded'  // Use form encoding
+                    },
+                    body: `data=${encodedData}`  // Send as form data
+                })
+                .then(response => {
+                    console.log(`Successfully sent ${eventName} event to Mixpanel:`, response);
+                })
+                .catch(error => {
+                    console.error('Failed to send event to Mixpanel:', error);
+                });
+
+            } catch (error) {
+                console.error('Error tracking event:', error);
+            }
+        }
+
+        // Update your existing event handlers to include tracking
+        translateButton.addEventListener('click', async () => {
+            trackEvent('Translation Started', {
+                textLength: textEditor.value.length,
+                targetLanguage: targetLanguageSelect.value
+            });
+            
+            // ... existing translation code ...
+            
+            // Track success/failure
+            try {
+                // ... your API call ...
+                trackEvent('Translation Completed', {
+                    textLength: textEditor.value.length,
+                    targetLanguage: targetLanguageSelect.value
+                });
+            } catch (error) {
+                trackEvent('Translation Failed', {
+                    error: error.message,
+                    textLength: textEditor.value.length,
+                    targetLanguage: targetLanguageSelect.value
+                });
+            }
+        });
+
+        enhanceButton.addEventListener('click', async () => {
+            trackEvent('Enhancement Started', {
+                textLength: textEditor.value.length
+            });
+            
+            // ... existing enhancement code ...
+        });
+
+        shortenButton.addEventListener('click', async () => {
+            trackEvent('Shorten Started', {
+                textLength: textEditor.value.length
+            });
+            
+            // ... existing shortening code ...
+        });
+
+        settingsButton.addEventListener('click', () => {
+            trackEvent('Settings Opened');
+            // ... existing settings code ...
+        });
+
+        applyToFigmaButton.addEventListener('click', () => {
+            trackEvent('Apply to Figma', {
+                textCount: currentProcessedTexts.length
+            });
+            // ... existing apply code ...
+        });
+
+        // Track language changes
+        targetLanguageSelect.addEventListener('change', (e) => {
+            trackEvent('Language Changed', {
+                language: e.target.value
+            });
+            // ... existing language change code ...
+        });
+
+        // Track theme changes
+        themeSelect.addEventListener('change', (e) => {
+            trackEvent('Theme Changed', {
+                theme: e.target.value
+            });
+            // ... existing theme change code ...
+        });
+
+        // Track when brand guidelines are updated
+        brandGuidelinesInput.addEventListener('change', () => {
+            trackEvent('Brand Guidelines Updated', {
+                hasGuidelines: brandGuidelinesInput.value.length > 0
+            });
+        });
     </script>
 </body>
 </html>

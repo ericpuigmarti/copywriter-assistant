@@ -3,9 +3,36 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.6] - 2024-03-27
+### Added
+- Mixpanel analytics integration for anonymous usage tracking
+- Comprehensive analytics documentation in docs/analytics.md
+- Event tracking for all major user interactions:
+  - Plugin load and initialization
+  - Text operations (translate/enhance/shorten)
+  - Settings changes and preferences
+  - Success/failure states for all operations
+  - Performance metrics for API calls
+
+### Technical
+- Added Mixpanel CDN integration
+- Implemented event tracking helper functions
+- Added performance timing for operations
+- Enhanced error tracking and reporting
+
 ## [0.3.5] - 2024-03-27
 ### Added
 - Warning notification when selecting hidden layers to improve user experience
+- Anonymous usage analytics to help improve plugin features
+- Comprehensive analytics documentation
+- Analytics integration with Mixpanel to track plugin usage
+- Event tracking for translations, including:
+  - Translation start/completion
+  - Text length metrics
+  - Target language selection
+  - Operation duration
+- Basic performance monitoring for API calls
+- Network request handling for analytics endpoints
 
 ### Changed
 - Improved text layer visibility detection to only process visible layers on canvas

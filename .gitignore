@@ -20,4 +20,9 @@ venv/
 
 # System files
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Node.js
+node_modules/
+dist/
+package-lock.json 
