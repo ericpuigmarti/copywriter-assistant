@@ -3,6 +3,14 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.7] - 2024-03-27
+### Fixed
+- Fixed footer section overlapping with main buttons in results view
+- Fixed text processing to handle individual text layers correctly
+- Improved text layer mapping to maintain unique IDs and content
+- Enhanced UI layout with proper spacing and padding
+- Added proper z-index handling for overlapping elements
+
 ## [0.3.6] - 2024-03-27
 ### Added
 - Mixpanel analytics integration for anonymous usage tracking

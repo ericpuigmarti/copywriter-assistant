@@ -111,6 +111,7 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            padding-bottom: 72px; /* Add padding to prevent content from being hidden behind footer */
             border-radius: 8px; /* Add border radius */
         }
 
@@ -918,18 +919,33 @@
         /* Update settings button container styles */
         .settings-button-container {
             position: fixed;
-            bottom: 16px;
-            right: 16px;
+            bottom: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
             transition: opacity 200ms ease;
-            background-color: var(--background-color); /* Match the background */
-            border-radius: 8px; /* Add border radius to match UI */
-            padding: 8px; /* Add some padding */
+            background-color: var(--background-color);
+            padding: 16px;
+            border-top: 1px solid var(--border-subtle);
         }
 
         .settings-button-container.hidden {
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Update the apply button container */
+        .apply-button-container {
+            padding: 0 16px 72px; /* Add bottom padding to prevent overlap with footer */
+            margin-top: auto;
+        }
+
+        /* Add styles for the container's inner div */
+        .settings-button-container > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-end;
         }
 
         /* Add these styles to your existing CSS */
@@ -1042,12 +1058,6 @@
 
         .back-button:hover {
             background: var(--button-hover);
-        }
-
-        /* Update the apply button container */
-        .apply-button-container {
-            padding: 0 16px 16px;
-            margin-top: auto;  /* Push to bottom */
         }
 
         /* Add styles for text separators */
@@ -1547,7 +1557,7 @@
         <!-- Add settings button container -->
         <div class="settings-button-container">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.5</span>
+                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.7</span>
                 <a href="https://tally.so/r/3yoGEB" target="_blank" class="feedback-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -1637,7 +1647,7 @@
             <div class="setting-item">
                 <div class="setting-content">
                     <div class="setting-title" style="color: var(--secondary-text); font-size: 12px;">Version</div>
-                    <div class="setting-description" style="color: var(--secondary-text); font-size: 12px;">0.3.4</div>
+                    <div class="setting-description" style="color: var(--secondary-text); font-size: 12px;">0.3.7</div>
                 </div>
             </div>
         </div>
@@ -1704,30 +1714,44 @@
                 textEditor.style.display = 'none';
                 document.querySelector('.action-panel').style.display = 'none';
 
-                const response = await callAPI(endpoint, data);
+                // Process each text individually
+                const processedTexts = [];
+                const originalTexts = Array.from(selectedTexts.entries());
                 
-                // Track success
-                trackEvent(`${endpoint} Completed`, {
-                    textLength: data.text?.length || 0,
+                for (const [id, text] of originalTexts) {
+                    const response = await callAPI(endpoint, {
+                        ...data,
+                        text: text
+                    });
+                    
+                    // Get the processed text based on endpoint
+                    const processedText = endpoint === 'translate' ? response.translatedText :
+                                        endpoint === 'shorten' ? response.shortenedText :
+                                        response.enhancedText;
+                    
+                    processedTexts.push({
+                        id: id,
+                        text: processedText
+                    });
+                }
+                
+                // Track success with proper event names
+                const eventName = endpoint === 'enhance' ? 'Enhancement' :
+                                endpoint === 'translate' ? 'Translation' :
+                                'Shorten';
+                
+                trackEvent(`${eventName} Completed`, {
+                    textCount: processedTexts.length,
                     duration: performance.now() - startTime,
                     targetLanguage: data.targetLanguage || null
                 });
                 
-                // Get the processed text based on endpoint
-                const processedText = endpoint === 'translate' ? response.translatedText :
-                                    endpoint === 'shorten' ? response.shortenedText :
-                                    response.enhancedText;
-
-                // Create arrays for original and processed text
-                // Use the stored selectedTexts Map to maintain text IDs
-                const originalTexts = Array.from(selectedTexts.entries()).map(([id, text]) => text);
-                const processedTexts = Array.from(selectedTexts.keys()).map(id => ({
-                    id: id,
-                    text: processedText
-                }));
-
                 // Show results with the correct operation type
-                showResults(originalTexts, processedTexts, endpoint);
+                showResults(
+                    originalTexts.map(([_, text]) => text),
+                    processedTexts,
+                    endpoint
+                );
                 
                 // Store for apply to Figma
                 currentProcessedTexts = processedTexts;
@@ -1737,10 +1761,14 @@
                 resultsView.style.display = 'block';
                 
             } catch (error) {
-                // Track failure
-                trackEvent(`${endpoint} Failed`, {
+                // Track failure with proper event names
+                const eventName = endpoint === 'enhance' ? 'Enhancement' :
+                                endpoint === 'translate' ? 'Translation' :
+                                'Shorten';
+                
+                trackEvent(`${eventName} Failed`, {
                     error: error.message,
-                    textLength: data.text?.length || 0,
+                    textCount: selectedTexts.size,
                     duration: performance.now() - startTime,
                     targetLanguage: data.targetLanguage || null
                 });
@@ -1756,12 +1784,6 @@
         // Update button handlers to use the new handleAPICall function
         translateButton.addEventListener('click', async () => {
             console.log('[Action] Starting translation process');
-            // Add tracking
-            trackEvent('Translation Started', {
-                textLength: textEditor.value.length,
-                targetLanguage: targetLanguageSelect.value
-            });
-            
             if (!textEditor.value.trim()) return;
             await handleAPICall('translate', {
                 text: textEditor.value,
@@ -1771,11 +1793,6 @@
 
         enhanceButton.addEventListener('click', async () => {
             console.log('[Action] Starting enhancement process');
-            // Add tracking
-            trackEvent('Enhancement Started', {
-                textLength: textEditor.value.length
-            });
-            
             if (!textEditor.value.trim()) return;
             await handleAPICall('enhance', {
                 text: textEditor.value
@@ -1784,11 +1801,6 @@
 
         shortenButton.addEventListener('click', async () => {
             console.log('[Action] Starting shortening process');
-            // Add tracking
-            trackEvent('Shorten Started', {
-                textLength: textEditor.value.length
-            });
-            
             if (!textEditor.value.trim()) return;
             
             try {
@@ -2313,7 +2325,7 @@
             updateButtonStates();
         });
 
-        // Update the showResults function to ensure proper view state
+        // Update the showResults function to handle multiple texts properly
         function showResults(originalTexts, processedTexts, operation) {
             console.log('[Results] Showing results view');
             
@@ -2405,57 +2417,15 @@
             }
         }
 
-        // Update your existing event handlers to include tracking
-        translateButton.addEventListener('click', async () => {
-            trackEvent('Translation Started', {
-                textLength: textEditor.value.length,
-                targetLanguage: targetLanguageSelect.value
-            });
-            
-            // ... existing translation code ...
-            
-            // Track success/failure
-            try {
-                // ... your API call ...
-                trackEvent('Translation Completed', {
-                    textLength: textEditor.value.length,
-                    targetLanguage: targetLanguageSelect.value
-                });
-            } catch (error) {
-                trackEvent('Translation Failed', {
-                    error: error.message,
-                    textLength: textEditor.value.length,
-                    targetLanguage: targetLanguageSelect.value
-                });
-            }
-        });
-
-        enhanceButton.addEventListener('click', async () => {
-            trackEvent('Enhancement Started', {
-                textLength: textEditor.value.length
-            });
-            
-            // ... existing enhancement code ...
-        });
-
-        shortenButton.addEventListener('click', async () => {
-            trackEvent('Shorten Started', {
-                textLength: textEditor.value.length
-            });
-            
-            // ... existing shortening code ...
-        });
-
+        // Track settings and UI interactions
         settingsButton.addEventListener('click', () => {
             trackEvent('Settings Opened');
-            // ... existing settings code ...
         });
 
         applyToFigmaButton.addEventListener('click', () => {
             trackEvent('Apply to Figma', {
                 textCount: currentProcessedTexts.length
             });
-            // ... existing apply code ...
         });
 
         // Track language changes
@@ -2463,7 +2433,6 @@
             trackEvent('Language Changed', {
                 language: e.target.value
             });
-            // ... existing language change code ...
         });
 
         // Track theme changes
@@ -2471,7 +2440,6 @@
             trackEvent('Theme Changed', {
                 theme: e.target.value
             });
-            // ... existing theme change code ...
         });
 
         // Track when brand guidelines are updated
