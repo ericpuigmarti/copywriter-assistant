@@ -10,6 +10,9 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Improved text layer mapping to maintain unique IDs and content
 - Enhanced UI layout with proper spacing and padding
 - Added proper z-index handling for overlapping elements
+- Fixed duplicate event tracking for text operations (translate/enhance/shorten)
+- Centralized event tracking in handleAPICall function
+- Added proper "Started" event tracking for all operations
 
 ## [0.3.6] - 2024-03-27
 ### Added
