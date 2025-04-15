@@ -110,11 +110,13 @@ function handleSelection() {
     const selection = figma.currentPage.selection;
     
     if (selection.length === 0) {
+        selectedTextLayers.clear(); // Clear the stored selection
         figma.ui.postMessage({
             type: 'selected-text',
             texts: [],
             hasContent: false
         });
+        figma.notify("⚠️ Please select text layer(s) to modify", { timeout: 2000 });
         return;
     }
 
@@ -134,7 +136,10 @@ function handleSelection() {
         // If it's a container (including instances)
         else if ("children" in node) {
             const foundLayers = findTextLayers(node, []);
-            allTextLayers = allTextLayers.concat(foundLayers);
+            allTextLayers = allTextLayers.concat(foundLayers.map(layer => ({
+                ...layer,
+                node: figma.getNodeById(layer.id) // Store the node reference
+            })));
         }
     }
     
@@ -142,7 +147,7 @@ function handleSelection() {
     if (allTextLayers.length > 0) {
         console.log(`Found ${allTextLayers.length} visible text layers`);
         
-        // Store in the map
+        // Store in the map with node references
         allTextLayers.forEach(layer => {
             selectedTextLayers.set(layer.id, {
                 text: layer.text,
@@ -158,11 +163,13 @@ function handleSelection() {
             hasContent: true
         });
     } else {
+        selectedTextLayers.clear();
         figma.ui.postMessage({
             type: 'selected-text',
             texts: [],
             hasContent: false
         });
+        figma.notify("⚠️ No text layers found in selection. Please select text layer(s) to modify", { timeout: 2000 });
     }
 }
 
@@ -172,36 +179,8 @@ handleSelection();
 
 // Add error handling to the selection change listener
 figma.on('selectionchange', () => {
-    const selection = figma.currentPage.selection;
-    
-    // Check if we have a single selected item that's hidden
-    if (selection.length === 1 && !isNodeTrulyVisible(selection[0])) {
-        figma.notify("⚠️ Selected layer is hidden. The plugin will only work with visible layers.", {
-            timeout: 5000,
-            error: true
-        });
-        return;
-    }
-
-    // Process visible text layers
-    const textLayers = [];
-    selection.forEach(node => {
-        if (node.type === 'TEXT' && isNodeTrulyVisible(node)) {
-            textLayers.push({
-                id: node.id,
-                text: node.characters
-            });
-        } else {
-            // For frames and other container types, find visible text layers within
-            findTextLayers(node, textLayers);
-        }
-    });
-
-    // Send text layers to UI
-    figma.ui.postMessage({
-        type: 'selected-text',
-        texts: textLayers
-    });
+    console.log('Selection changed');
+    handleSelection(); // This will now handle all cases including empty selection
 });
 
 // Handle messages from UI

@@ -1906,7 +1906,10 @@
                         textEditor.value = combinedText.trim();
                         updateButtonStates(); // Update button states when text is received
                     } else {
-                        textEditor.value = '';
+                        // Only clear the text if we're not in results view
+                        if (resultsView.style.display !== 'block') {
+                            textEditor.value = '';
+                        }
                         updateButtonStates(); // Update button states when text is cleared
                     }
                     break;
@@ -1990,9 +1993,23 @@
         // Function to update button states
         function updateButtonStates() {
             const hasText = textEditor.value.trim().length > 0;
-            translateButton.disabled = !hasText;
-            enhanceButton.disabled = !hasText;
-            shortenButton.disabled = !hasText;
+            const hasSelection = selectedTexts.size > 0;
+            
+            // Update button states based on both text content and selection
+            translateButton.disabled = !hasText || !hasSelection;
+            enhanceButton.disabled = !hasText || !hasSelection;
+            shortenButton.disabled = !hasText || !hasSelection;
+            
+            // Update button styles
+            [translateButton, enhanceButton, shortenButton].forEach(button => {
+                if (button.disabled) {
+                    button.style.opacity = '0.5';
+                    button.style.cursor = 'not-allowed';
+                } else {
+                    button.style.opacity = '1';
+                    button.style.cursor = 'pointer';
+                }
+            });
         }
 
         // Add textarea event listeners
