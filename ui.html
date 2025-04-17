@@ -2096,11 +2096,12 @@
                 totalCharacters: currentProcessedTexts.reduce((sum, text) => sum + text.text.length, 0)
             });
             
-            // Send processed texts back to Figma
+            // Send processed texts back to Figma with the correct message type
             parent.postMessage({
                 pluginMessage: {
-                    type: 'apply-text',
-                    texts: currentProcessedTexts
+                    type: 'update-text',
+                    processedTexts: currentProcessedTexts,
+                    operation: 'apply'
                 }
             }, '*');
             
