@@ -9,6 +9,9 @@ All notable changes to the Copywriting Assistant plugin will be documented in th
 - Added validation and error handling for empty processed texts
 - Added logging to help diagnose apply functionality issues
 - Fixed event tracking order in handleAPICall function
+- Implemented proper async mixpanel loading with event queueing
+- Fixed mixpanel initialization and error handling
+- Added fallback for analytics when mixpanel fails to load
 
 ## [0.3.7] - 2024-03-27
 ### Fixed
