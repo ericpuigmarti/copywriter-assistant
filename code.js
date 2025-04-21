@@ -106,7 +106,7 @@ function findTextLayers(node, textLayers = []) {
 }
 
 // Simplified handleSelection function
-function handleSelection() {
+async function handleSelection() {
     const selection = figma.currentPage.selection;
     
     if (selection.length === 0) {
@@ -136,13 +136,13 @@ function handleSelection() {
         // If it's a container (including instances)
         else if ("children" in node) {
             const foundLayers = findTextLayers(node, []);
-            foundLayers.forEach(layer => {
+            for (const layer of foundLayers) {
                 allTextLayers.push({
                     id: layer.id,
                     text: layer.text,
-                    node: figma.getNodeById(layer.id) // Store the node reference
+                    node: await figma.getNodeByIdAsync(layer.id) // Use async version
                 });
-            });
+            }
         }
     }
     
@@ -176,14 +176,15 @@ function handleSelection() {
     }
 }
 
-// Run initial selection check
-console.log('Running initial selection check');
-handleSelection();
+// Handle initial selection
+(async () => {
+    await handleSelection();
+})();
 
 // Add error handling to the selection change listener
-figma.on('selectionchange', () => {
+figma.on('selectionchange', async () => {
     console.log('Selection changed');
-    handleSelection(); // This will now handle all cases including empty selection
+    await handleSelection(); // This will now handle all cases including empty selection
 });
 
 // Handle messages from UI
@@ -194,7 +195,7 @@ figma.ui.onmessage = async (msg) => {
     switch (msg.type) {
         case 'get-selected-text':
             console.log('Received get-selected-text request');
-            handleSelection();
+            await handleSelection();
             break;
 
         case 'update-text':

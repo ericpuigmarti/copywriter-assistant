@@ -1305,30 +1305,141 @@
             border-radius: 8px;
             padding: 4px;
         }
+
+        /* Add styles for text lists */
+        .text-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .text-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .text-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Custom select styles */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 200ms ease;
+        }
+
+        .custom-select:hover {
+            background: var(--button-hover);
+        }
+
+        .custom-select.active {
+            border-color: var(--accent-color);
+        }
+
+        .custom-select svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--secondary-text);
+            transition: transform 200ms ease;
+        }
+
+        .custom-select.active svg {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 4px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-select-option {
+            padding: 8px 12px;
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 200ms ease;
+        }
+
+        .custom-select-option:hover {
+            background: var(--button-hover);
+        }
+
+        .custom-select-option.selected {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
     </style>
 
     <!-- Add Mixpanel -->
-    <script src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"></script>
     <script>
+        // Create a queue to store events before mixpanel loads
+        window._trackingQueue = [];
+        
+        // Safe tracking function that works before and after initialization
+        function trackEvent(eventName, properties = {}) {
+            try {
+                if (window.mixpanel && typeof window.mixpanel.track === 'function') {
+                    console.log(`Tracking event: ${eventName}`, properties);
+                    window.mixpanel.track(eventName, properties);
+                } else {
+                    console.log(`Queuing event: ${eventName}`, properties);
+                    window._trackingQueue.push({ eventName, properties });
+                }
+            } catch (error) {
+                console.warn('Error in trackEvent:', error);
+            }
+        }
+
+        // Function to process queued events
+        function processTrackingQueue() {
+            if (!window._trackingQueue) return;
+            
+            while (window._trackingQueue.length > 0) {
+                const event = window._trackingQueue.shift();
+                trackEvent(event.eventName, event.properties);
+            }
+        }
+
+        // Load Mixpanel asynchronously
+        (function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+        for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}var d={},e="get_group";for(h=0;h<j.length;h++)b(j[h]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+
         // Initialize Mixpanel
         mixpanel.init('c82fa745ac9100cd811c50438d0353d3', {
             debug: true,
             track_pageview: false,
-            persistence: 'localStorage'
-        });
-        
-        console.log('Mixpanel initialized:', mixpanel);
-        mixpanel.track('Plugin Loaded');
-        
-        // Simplified event tracking function
-        function trackEvent(eventName, properties = {}) {
-            try {
-                console.log(`Attempting to track event: ${eventName}`, properties);
-                mixpanel.track(eventName, properties);
-            } catch (error) {
-                console.error('Error tracking event:', error);
+            loaded: function(mixpanel) {
+                console.log('Mixpanel loaded successfully');
+                processTrackingQueue();
             }
-        }
+        });
     </script>
 </head>
 <body>
@@ -1440,7 +1551,7 @@
                             <h3>Original Text</h3>
                         </div>
                         <div class="results-content original">
-                    <p id="originalText"></p>
+                            <p id="originalText"></p>
                         </div>
                     </div>
                     <div class="results-column">
@@ -1448,7 +1559,7 @@
                             <h3>Enhanced Text</h3>
                         </div>
                         <div class="results-content processed">
-                    <p id="processedText"></p>
+                            <p id="processedText"></p>
                         </div>
                     </div>
                 </div>
@@ -1558,7 +1669,7 @@
         <!-- Add settings button container -->
         <div class="settings-button-container">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.8</span>
+                <span style="color: var(--secondary-text); font-size: 12px;">v0.3.9</span>
                 <a href="https://tally.so/r/3yoGEB" target="_blank" class="feedback-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -1677,13 +1788,28 @@
         let selectedTexts = new Map();
 
         // Initialize theme and request initial data
+        let initialized = false;
         document.addEventListener('DOMContentLoaded', () => {
+            if (initialized) return;
+            initialized = true;
+            
+            // Request data first
+            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+            
+            // Initialize theme
             initializeTheme();
             
-            // Request initial data
-            parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
-            parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
+            // Add click handler for closing dropdowns
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-select-options').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelectorAll('.custom-select').forEach(select => {
+                    select.classList.remove('active');
+                });
+            }, { capture: true });
         });
 
         // Show/hide functions
@@ -1711,12 +1837,10 @@
             const startTime = performance.now();
             
             try {
-                // Get the event name first
                 const eventName = endpoint === 'enhance' ? 'Enhancement' :
                                 endpoint === 'translate' ? 'Translation' :
                                 'Shorten';
                 
-                // Track operation start at the beginning
                 trackEvent(`${eventName} Started`, {
                     textCount: selectedTexts.size,
                     targetLanguage: data.targetLanguage || null
@@ -1734,10 +1858,9 @@
                 for (const [id, text] of originalTexts) {
                     const response = await callAPI(endpoint, {
                         ...data,
-                        text: text
+                        text: text // Process each text separately
                     });
                     
-                    // Get the processed text based on endpoint
                     const processedText = endpoint === 'translate' ? response.translatedText :
                                         endpoint === 'shorten' ? response.shortenedText :
                                         response.enhancedText;
@@ -1754,7 +1877,7 @@
                     targetLanguage: data.targetLanguage || null
                 });
                 
-                // Show results with the correct operation type
+                // Show results with original texts array and processed texts
                 showResults(
                     originalTexts.map(([_, text]) => text),
                     processedTexts,
@@ -1769,11 +1892,7 @@
                 resultsView.style.display = 'block';
                 
             } catch (error) {
-                // Track failure with proper event names
-                const eventName = endpoint === 'enhance' ? 'Enhancement' :
-                                endpoint === 'translate' ? 'Translation' :
-                                'Shorten';
-                
+                console.error(`[${endpoint}] Error:`, error);
                 trackEvent(`${eventName} Failed`, {
                     error: error.message,
                     textCount: selectedTexts.size,
@@ -1781,7 +1900,6 @@
                     targetLanguage: data.targetLanguage || null
                 });
                 
-                console.error(`[${endpoint}] Error:`, error);
                 loadingIndicator.style.display = 'none';
                 textEditor.style.display = 'block';
                 document.querySelector('.action-panel').style.display = 'flex';
@@ -1810,91 +1928,64 @@
         shortenButton.addEventListener('click', async () => {
             console.log('[Action] Starting shortening process');
             if (!textEditor.value.trim()) return;
-            
-            try {
-                // Show loading state
-                loadingIndicator.style.display = 'flex';
-                textEditor.style.display = 'none';
-                document.querySelector('.action-panel').style.display = 'none';
-                
-                const response = await callAPI('shorten', {
-                    text: textEditor.value
-                });
-                
-                console.log('[Shorten] Response:', response);
-                
-                // Update results view
-                const originalTextDiv = document.getElementById('originalText');
-                const processedTextDiv = document.getElementById('processedText');
-                
-                // Clear previous content
-                originalTextDiv.innerHTML = '';
-                processedTextDiv.innerHTML = '';
-                
-                // Add new content
-                const originalP = document.createElement('p');
-                originalP.textContent = textEditor.value;
-                originalTextDiv.appendChild(originalP);
-                
-                const processedP = document.createElement('p');
-                processedP.textContent = response.shortenedText;
-                processedTextDiv.appendChild(processedP);
-                
-                // Update header
-                document.querySelectorAll('.results-column-header h3')[1].textContent = 'Shortened Text';
-                
-                // Hide loading, show results
-                loadingIndicator.style.display = 'none';
-                resultsView.style.display = 'block';
-                
-                // Store for apply to Figma - use the stored selectedTexts Map
-                currentProcessedTexts = Array.from(selectedTexts.keys()).map(id => ({
-                    id: id,
-                    text: response.shortenedText
-                }));
-                
-            } catch (error) {
-                console.error('[Shorten] Error:', error);
-                loadingIndicator.style.display = 'none';
-                textEditor.style.display = 'block';
-                document.querySelector('.action-panel').style.display = 'flex';
-                alert('Failed to shorten text. Please try again.');
-            }
+            await handleAPICall('shorten', {
+                text: textEditor.value
+            });
         });
 
         // Helper function for API calls
         async function callAPI(endpoint, data) {
             const startTime = performance.now();
+            const apiUrl = `https://copywriter-assistant-server.onrender.com/${endpoint}`;
+            console.log(`[API Call] ${endpoint} request to ${apiUrl}:`, data);
+            
             try {
-                const response = await fetch(`https://copywriter-assistant-server.onrender.com/${endpoint}`, {
+                if (!data.text || data.text.trim().length === 0) {
+                    throw new Error('No text provided to process');
+                }
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    credentials: 'omit',
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        ...data,
+                        text: data.text.trim()
+                    })
                 });
                 
-                const endTime = performance.now();
-                console.log(`API Call Performance:
-                    - Endpoint: ${endpoint}
-                    - Total time: ${(endTime - startTime).toFixed(2)}ms
-                    - Text length: ${data.text?.length || 0} chars`);
-                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text().catch(() => 'Unknown error');
+                    console.error(`[API Call] ${endpoint} error:`, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        error: errorText
+                    });
+                    throw new Error(
+                        response.status === 404 ? 'Service is temporarily unavailable. Please try again in a few moments.' :
+                        response.status === 429 ? 'Too many requests. Please wait a moment and try again.' :
+                        `Server error: ${errorText}`
+                    );
                 }
                 
-                return await response.json();
+                const result = await response.json();
+                console.log(`[API Call] ${endpoint} success:`, result);
+                
+                const endTime = performance.now();
+                console.log(`[API Call] ${endpoint} completed in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                return result;
+                
             } catch (error) {
-                console.error(`${endpoint} error:`, error);
-                throw error;
+                console.error(`[API Call] ${endpoint} failed:`, error);
+                throw new Error(error.message || 'Failed to process text. Please try again.');
             }
         }
 
-        // Update the message handler to trigger button state update
-        window.onmessage = async (event) => {
+        // Update the message handler
+        let messageHandler = async (event) => {
             const msg = event.data.pluginMessage;
             if (!msg) return;
 
@@ -1902,22 +1993,46 @@
                 case 'selected-text':
                     console.log('Received selected texts:', msg.texts);
                     selectedTexts.clear();
-                    let combinedText = '';
                     
                     if (msg.texts && msg.texts.length > 0) {
                         msg.texts.forEach(item => {
                             selectedTexts.set(item.id, item.text);
-                            combinedText += item.text + '\n\n';
                         });
+                        const displayText = Array.from(selectedTexts.values()).join('\n\n');
+                        textEditor.value = displayText;
+                    } else if (resultsView.style.display !== 'block') {
+                        textEditor.value = '';
+                    }
+                    updateButtonStates();
+                    break;
+
+                case 'set-language':
+                    if (!msg.language) return;
+                    console.log('Setting language to:', msg.language);
+                    
+                    // Update the native select without triggering change event
+                    if (targetLanguageSelect.value !== msg.language) {
+                        targetLanguageSelect.value = msg.language;
                         
-                        textEditor.value = combinedText.trim();
-                        updateButtonStates(); // Update button states when text is received
-                    } else {
-                        // Only clear the text if we're not in results view
-                        if (resultsView.style.display !== 'block') {
-                            textEditor.value = '';
+                        // Force synchronous UI update
+                        const wrapper = targetLanguageSelect.closest('.custom-select-wrapper');
+                        if (wrapper) {
+                            const customSelect = wrapper.querySelector('.custom-select');
+                            if (customSelect) {
+                                const selectedOption = targetLanguageSelect.options[targetLanguageSelect.selectedIndex];
+                                const span = customSelect.querySelector('span');
+                                if (span && selectedOption) {
+                                    span.textContent = selectedOption.text;
+                                }
+                            }
+                            
+                            const optionsContainer = wrapper.querySelector('.custom-select-options');
+                            if (optionsContainer) {
+                                optionsContainer.querySelectorAll('.custom-select-option').forEach(option => {
+                                    option.classList.toggle('selected', option.dataset.value === msg.language);
+                                });
+                            }
                         }
-                        updateButtonStates(); // Update button states when text is cleared
                     }
                     break;
 
@@ -1925,13 +2040,6 @@
                     console.log('Received saved guidelines:', msg.guidelines);
                     if (msg.guidelines) {
                         brandGuidelinesInput.value = msg.guidelines;
-                    }
-                    break;
-
-                case 'set-language':
-                    console.log('Setting language to:', msg.language);
-                    if (msg.language) {
-                        targetLanguageSelect.value = msg.language;
                     }
                     break;
 
@@ -1975,6 +2083,9 @@
                     break;
             }
         };
+
+        // Remove any existing message handler and add the new one
+        window.onmessage = messageHandler;
 
         // Keep helper functions outside
         function setTheme(theme) {
@@ -2208,91 +2319,237 @@
             }, '*');
         });
 
-        // Add this after the other event listeners in the script section
+        // Update targetLanguageSelect event handler
         targetLanguageSelect.addEventListener('change', (e) => {
             const selectedLanguage = e.target.value;
             console.log('Language changed to:', selectedLanguage);
             
-            trackEvent('Language Changed', {
-                language: selectedLanguage
-            });
-            
-            // Save language preference to Figma storage
-            parent.postMessage({
-                pluginMessage: {
-                    type: 'save-language',
+            // Only track and save if it's a user-initiated change
+            if (e.isTrusted) {
+                trackEvent('Language Changed', {
                     language: selectedLanguage
-                }
-            }, '*');
+                });
+                
+                // Save language preference to Figma storage
+                parent.postMessage({
+                    pluginMessage: {
+                        type: 'save-language',
+                        language: selectedLanguage
+                    }
+                }, '*');
+            }
         });
 
         // Add this to your existing script section
         function initializeCustomSelects() {
             document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
                 const select = wrapper.querySelector('select');
-                const customSelect = document.createElement('div');
+                if (!select) return;
+
+                // Create new custom select elements
+                const customSelect = document.createElement('button');
                 customSelect.className = 'custom-select';
-                customSelect.textContent = select.options[select.selectedIndex].text;
+                customSelect.type = 'button';
+                
+                // Important: Get the currently selected option
+                const selectedOption = select.options[select.selectedIndex];
+                customSelect.innerHTML = `
+                    <span>${selectedOption.text}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                `;
 
                 const optionsContainer = document.createElement('div');
                 optionsContainer.className = 'custom-select-options';
-
-                // Create custom options
-                Array.from(select.options).forEach((option, index) => {
+                
+                // Create options and mark the current selection
+                Array.from(select.options).forEach((option) => {
                     const customOption = document.createElement('div');
                     customOption.className = 'custom-select-option';
-                    if (index === select.selectedIndex) {
+                    if (option.value === select.value) {
                         customOption.classList.add('selected');
                     }
                     customOption.textContent = option.text;
                     customOption.dataset.value = option.value;
                     
-                    customOption.addEventListener('click', () => {
+                    customOption.addEventListener('click', (e) => {
+                        e.stopPropagation();
                         select.value = option.value;
-                        customSelect.textContent = option.text;
-                        optionsContainer.style.display = 'none';
                         
-                        // Remove selected class from all options
+                        // Update the button text
+                        const span = customSelect.querySelector('span');
+                        if (span) {
+                            span.textContent = option.text;
+                        }
+                        
+                        // Update selected state
                         optionsContainer.querySelectorAll('.custom-select-option').forEach(opt => {
                             opt.classList.remove('selected');
                         });
                         customOption.classList.add('selected');
                         
-                        // Trigger change event on the original select
+                        // Hide dropdown
+                        optionsContainer.style.display = 'none';
+                        customSelect.classList.remove('active');
+                        
+                        // Trigger change event
                         select.dispatchEvent(new Event('change'));
                     });
                     
                     optionsContainer.appendChild(customOption);
                 });
 
-                // Replace the original select with our custom elements
-                select.style.display = 'none';
+                // Remove any existing custom UI
+                const existingCustomSelect = wrapper.querySelector('.custom-select');
+                const existingOptionsContainer = wrapper.querySelector('.custom-select-options');
+                if (existingCustomSelect) existingCustomSelect.remove();
+                if (existingOptionsContainer) existingOptionsContainer.remove();
+
+                // Add new elements
                 wrapper.appendChild(customSelect);
                 wrapper.appendChild(optionsContainer);
 
-                // Toggle options display
+                // Hide original select
+                select.style.display = 'none';
+
+                // Toggle dropdown
                 customSelect.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const isOpen = optionsContainer.style.display === 'block';
-                    // Close all other open dropdowns
+                    
+                    // Close all dropdowns
                     document.querySelectorAll('.custom-select-options').forEach(container => {
                         container.style.display = 'none';
                     });
-                    optionsContainer.style.display = isOpen ? 'none' : 'block';
-                });
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', () => {
-                    optionsContainer.style.display = 'none';
+                    document.querySelectorAll('.custom-select').forEach(select => {
+                        select.classList.remove('active');
+                    });
+                    
+                    if (!isOpen) {
+                        optionsContainer.style.display = 'block';
+                        customSelect.classList.add('active');
+                    }
                 });
             });
         }
 
-        // Call this after the DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCustomSelects();
-            // ... your other initialization code ...
-        });
+        // Update styles for custom select
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            .custom-select-wrapper {
+                position: relative;
+                width: 100%;
+            }
+
+            .custom-select {
+                width: 100%;
+                padding: 12px 16px;
+                background: var(--surface-color);
+                border: 1px solid var(--border-subtle);
+                border-radius: 8px;
+                color: var(--text-color);
+                font-family: inherit;
+                font-size: 14px;
+                text-align: left;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                transition: all 200ms ease;
+            }
+
+            .custom-select:hover {
+                background: var(--button-hover);
+            }
+
+            .custom-select.active {
+                border-color: var(--accent-color);
+            }
+
+            .custom-select svg {
+                width: 16px;
+                height: 16px;
+                stroke: var(--secondary-text);
+                transition: transform 200ms ease;
+            }
+
+            .custom-select.active svg {
+                transform: rotate(180deg);
+            }
+
+            .custom-select-options {
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                right: 0;
+                background: var(--surface-color);
+                border: 1px solid var(--border-subtle);
+                border-radius: 8px;
+                padding: 4px;
+                display: none;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .custom-select-option {
+                padding: 8px 12px;
+                color: var(--text-color);
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: all 200ms ease;
+            }
+
+            .custom-select-option:hover {
+                background: var(--button-hover);
+            }
+
+            .custom-select-option.selected {
+                color: var(--accent-color);
+                font-weight: 500;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Update the updateLanguageSelect function
+        function updateLanguageSelect(language) {
+            if (!language) return;
+            
+            try {
+                // Check if language exists in options
+                const optionExists = Array.from(targetLanguageSelect.options).some(option => option.value === language);
+                if (!optionExists) {
+                    console.warn(`Language ${language} not found in options`);
+                    return;
+                }
+                
+                console.log('Updating language select to:', language);
+                
+                // Update the native select
+                targetLanguageSelect.value = language;
+                
+                // Get the wrapper and reinitialize
+                const wrapper = targetLanguageSelect.closest('.custom-select-wrapper');
+                if (wrapper) {
+                    // Remove existing custom UI
+                    const existingCustomSelect = wrapper.querySelector('.custom-select');
+                    const existingOptionsContainer = wrapper.querySelector('.custom-select-options');
+                    if (existingCustomSelect) existingCustomSelect.remove();
+                    if (existingOptionsContainer) existingOptionsContainer.remove();
+                    
+                    // Reinitialize custom select
+                    initializeCustomSelects();
+                }
+                
+                // Log the current state after update
+                console.log('Current select value:', targetLanguageSelect.value);
+                console.log('Selected option text:', targetLanguageSelect.options[targetLanguageSelect.selectedIndex].text);
+                
+            } catch (error) {
+                console.error('Error updating language select:', error);
+            }
+        }
 
         // Add this to your existing script section, after the other button handlers
         const tryAgainButton = document.getElementById('tryAgainButton');

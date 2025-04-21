@@ -3,7 +3,19 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
-## [0.3.8] - 2024-03-27
+## [0.3.9] - 2024-04-17
+### Fixed
+- Fixed text processing to maintain separate text elements instead of concatenating them
+- Fixed incorrect text merging when processing multiple selections
+- Added proper text element separation in results view
+- Improved handling of multiple text layer selections
+- Fixed shorten operation to properly handle multiple text elements
+- Unified text processing logic across all operations (translate, enhance, shorten)
+- Restored working implementation of text layer mapping and updating
+- Fixed text concatenation issues by using consistent API handling
+- Fixed language initialization to properly sync UI dropdown with saved language preference
+
+## [0.3.8] - 2024-04-16
 ### Fixed
 - Fixed "Apply to Figma" button not working for enhancement operations
 - Added validation and error handling for empty processed texts
