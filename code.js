@@ -230,21 +230,12 @@ figma.ui.onmessage = async (msg) => {
                     if (layerInfo && layerInfo.node) {
                         try {
                             const node = layerInfo.node;
-                            // Load Inter font first
-                            await loadInterFontStyles();
-                            // Then load any other fonts used in the text
-                            const fonts = node.getRangeAllFontNames(0, node.characters.length);
-                            for (const font of fonts) {
-                                await figma.loadFontAsync(font);
-                            }
-                            // Update text
+                            // Load fonts already used on the layer (same pattern as apply-text)
+                            await Promise.all(
+                                node.getRangeAllFontNames(0, node.characters.length)
+                                    .map(font => figma.loadFontAsync(font))
+                            );
                             node.characters = text;
-                            // Set font to Inter if possible
-                            try {
-                                node.fontName = { family: "Inter", style: "Regular" };
-                            } catch (fontError) {
-                                console.warn('Could not apply Inter font:', fontError);
-                            }
                             updatedCount++;
                         } catch (error) {
                             console.error(`Error updating layer ${id}:`, error);

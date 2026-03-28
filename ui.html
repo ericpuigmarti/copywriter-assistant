@@ -1913,7 +1913,8 @@
             if (!textEditor.value.trim()) return;
             await handleAPICall('translate', {
                 text: textEditor.value,
-                targetLanguage: targetLanguageSelect.value
+                targetLanguage: targetLanguageSelect.value,
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
             });
         });
 
@@ -1921,7 +1922,8 @@
             console.log('[Action] Starting enhancement process');
             if (!textEditor.value.trim()) return;
             await handleAPICall('enhance', {
-                text: textEditor.value
+                text: textEditor.value,
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
             });
         });
 
@@ -1929,7 +1931,8 @@
             console.log('[Action] Starting shortening process');
             if (!textEditor.value.trim()) return;
             await handleAPICall('shorten', {
-                text: textEditor.value
+                text: textEditor.value,
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
             });
         });
 
@@ -2056,7 +2059,8 @@
                         // Call API with correct operation
                         const response = await callAPI(msg.operation, {
                             text: msg.texts[0].text,
-                            targetLanguage: msg.params.targetLanguage
+                            targetLanguage: msg.params.targetLanguage,
+                            brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
                         });
                         
                         // Get the correct response property based on operation
@@ -2231,8 +2235,8 @@
                 document.querySelector('.action-panel').style.display = 'none';
                 document.querySelector('.section-title').style.display = 'none';
                 
-                // Get brand guidelines if they exist
-                const brandGuidelines = document.getElementById('brandGuidelinesInput')?.value || '';
+                // Current guidelines from settings (same source as other tools)
+                const brandGuidelines = document.getElementById('brandGuidelinesInput')?.value ?? '';
                 
                 // Call API
                 const response = await callAPI('quality-check', {

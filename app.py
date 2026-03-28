@@ -37,6 +37,39 @@ CORS(app, resources={
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
+
+def load_system_prompt(filename):
+    prompt_path = Path(__file__).parent / filename
+    try:
+        with open(prompt_path, 'r') as file:
+            return file.read().strip()
+    except Exception as e:
+        logger.warning("Error loading system prompt %s: %s", filename, e)
+        return None
+
+
+def brand_guidelines_block(data):
+    """Match quality-check: optional brandGuidelines from JSON body."""
+    raw = (data or {}).get('brandGuidelines')
+    if raw is None:
+        raw = ''
+    text = raw.strip() if isinstance(raw, str) else ''
+    return text if text else 'No specific brand guidelines provided.'
+
+
+ENHANCE_SYSTEM_PROMPT = (
+    load_system_prompt('system_prompt_enhance.txt')
+    or "You are a helpful copywriting assistant."
+)
+SHORTEN_SYSTEM_PROMPT = (
+    load_system_prompt('system_prompt_shorten.txt')
+    or "You are a helpful copywriting assistant."
+)
+TRANSLATE_SYSTEM_PROMPT = (
+    load_system_prompt('system_prompt_translate.txt')
+    or "You are a helpful translation assistant."
+)
+
 # Test endpoint
 @app.route('/test', methods=['GET'])
 def test():
@@ -50,8 +83,9 @@ def test():
 @app.route('/enhance', methods=['POST'])
 def enhance():
     try:
-        data = request.json
+        data = request.json or {}
         text = data.get('text', '')
+        guidelines = brand_guidelines_block(data)
         
         if not text:
             return jsonify({'error': 'No text provided'}), 400
@@ -59,8 +93,14 @@ def enhance():
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful copywriting assistant."},
-                {"role": "user", "content": f"Enhance this text:\n\n{text}"}
+                {"role": "system", "content": ENHANCE_SYSTEM_PROMPT},
+                {"role": "user", "content": f"""Enhance this text:
+
+{text}
+
+Brand Guidelines:
+{guidelines}
+"""}
             ]
         )
         
@@ -74,8 +114,9 @@ def enhance():
 @app.route('/shorten', methods=['POST'])
 def shorten():
     try:
-        data = request.json
+        data = request.json or {}
         text = data.get('text', '')
+        guidelines = brand_guidelines_block(data)
         
         if not text:
             return jsonify({'error': 'No text provided'}), 400
@@ -83,8 +124,14 @@ def shorten():
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful copywriting assistant."},
-                {"role": "user", "content": f"Create a shorter version of this text:\n\n{text}"}
+                {"role": "system", "content": SHORTEN_SYSTEM_PROMPT},
+                {"role": "user", "content": f"""Create a shorter version of this text:
+
+{text}
+
+Brand Guidelines:
+{guidelines}
+"""}
             ]
         )
         
@@ -99,9 +146,10 @@ def shorten():
 def translate():
     start_time = time.time()
     try:
-        data = request.json
+        data = request.json or {}
         text = data.get('text', '')
         target_language = data.get('targetLanguage', '')
+        guidelines = brand_guidelines_block(data)
         
         if not text or not target_language:
             return jsonify({'error': 'Text and target language are required'}), 400
@@ -111,8 +159,14 @@ def translate():
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful translation assistant."},
-                {"role": "user", "content": f"Translate this text to {target_language}:\n\n{text}"}
+                {"role": "system", "content": TRANSLATE_SYSTEM_PROMPT},
+                {"role": "user", "content": f"""Translate this text to {target_language}:
+
+{text}
+
+Brand Guidelines:
+{guidelines}
+"""}
             ]
         )
         api_duration = time.time() - api_start
@@ -133,16 +187,6 @@ def translate():
     except Exception as e:
         logger.error(f"Translation error: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
-# Add this function to load the system prompt
-def load_system_prompt(filename):
-    prompt_path = Path(__file__).parent / filename
-    try:
-        with open(prompt_path, 'r') as file:
-            return file.read().strip()
-    except Exception as e:
-        print(f"Error loading system prompt: {e}")
-        return None
 
 # Update the system prompt loading to include response format
 QUALITY_CHECK_PROMPT = f"""
