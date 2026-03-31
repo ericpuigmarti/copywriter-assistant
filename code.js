@@ -56,6 +56,19 @@ async function initializeSettings() {
             guidelines: savedGuidelines || ''
         });
 
+        // Get saved tone
+        const savedTone = await figma.clientStorage.getAsync('tone');
+        figma.ui.postMessage({
+            type: 'set-tone',
+            tone: savedTone || 'Professional'
+        });
+
+        const hideTonePanel = await figma.clientStorage.getAsync('hideTonePanel');
+        figma.ui.postMessage({
+            type: 'set-hide-tone-panel',
+            hidden: !!hideTonePanel
+        });
+
     } catch (error) {
         console.error('[initializeSettings] Error:', error);
         figma.notify('Error loading settings');
@@ -300,6 +313,32 @@ figma.ui.onmessage = async (msg) => {
             } catch (error) {
                 console.error('Error saving brand guidelines:', error);
                 figma.notify('Error saving brand guidelines');
+            }
+            break;
+
+        case 'save-tone':
+            await figma.clientStorage.setAsync('tone', msg.tone);
+            break;
+
+        case 'get-tone':
+            const savedTone = await figma.clientStorage.getAsync('tone');
+            figma.ui.postMessage({ type: 'set-tone', tone: savedTone || 'Professional' });
+            break;
+
+        case 'save-hide-tone-panel':
+            try {
+                await figma.clientStorage.setAsync('hideTonePanel', msg.hidden === true);
+            } catch (error) {
+                console.error('Error saving hide tone panel:', error);
+            }
+            break;
+
+        case 'get-hide-tone-panel':
+            try {
+                const hidden = await figma.clientStorage.getAsync('hideTonePanel');
+                figma.ui.postMessage({ type: 'set-hide-tone-panel', hidden: !!hidden });
+            } catch (error) {
+                console.error('[get-hide-tone-panel] Error:', error);
             }
             break;
 

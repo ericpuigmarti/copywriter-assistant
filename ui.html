@@ -459,6 +459,9 @@
         .results-column-header {
             padding: 12px 16px;
             border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .results-column-header h3 {
@@ -1395,6 +1398,157 @@
             color: var(--accent-color);
             font-weight: 500;
         }
+
+        /* Copy button in results header */
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: color 150ms ease, background-color 150ms ease;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            color: var(--text-color);
+            background-color: var(--button-hover);
+        }
+
+        .copy-btn svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            stroke-width: 2;
+            flex-shrink: 0;
+        }
+
+        /* Error toast */
+        .error-toast {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            right: 16px;
+            background: #dc2626;
+            color: #ffffff;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            z-index: 600;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 200ms ease, transform 200ms ease;
+            pointer-events: none;
+        }
+
+        .error-toast.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .error-toast-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            opacity: 0.8;
+        }
+
+        .error-toast-close:hover {
+            opacity: 1;
+        }
+
+        /* Tone selector */
+        .tone-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 16px 0 8px 0;
+        }
+
+        .tone-selector {
+            display: flex;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .tone-btn {
+            flex: 1;
+            height: 36px;
+            padding: 0;
+            border: 1px solid var(--border-subtle);
+            border-left: none;
+            background-color: var(--button-bg);
+            color: var(--secondary-text);
+            font-size: 11px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 150ms ease, color 150ms ease;
+        }
+
+        .tone-btn:first-child {
+            border-left: 1px solid var(--border-subtle);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .tone-btn:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tone-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .settings-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+            background: var(--surface-color);
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .settings-toggle-label {
+            font-size: 14px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .settings-toggle-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
     </style>
 
     <!-- Add Mixpanel -->
@@ -1446,6 +1600,16 @@
     <div class="container">
         <main>
             <textarea id="textEditor" class="textarea" placeholder="Select text in Figma or type here..."></textarea>
+            <div id="toneSection">
+                <div class="tone-label">Tone</div>
+                <div class="tone-selector">
+                    <button class="tone-btn active" data-tone="Professional">Professional</button>
+                    <button class="tone-btn" data-tone="Friendly">Friendly</button>
+                    <button class="tone-btn" data-tone="Casual">Casual</button>
+                    <button class="tone-btn" data-tone="Bold">Bold</button>
+                    <button class="tone-btn" data-tone="Minimal">Minimal</button>
+                </div>
+            </div>
             <div class="section-title">Writing tools</div>
             <div class="action-panel">
                 <button id="translateButton" class="action-btn" disabled>
@@ -1533,7 +1697,7 @@
             </div>
             <div id="loadingIndicator" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <div class="loading-text">Processing...</div>
+                <div id="loadingText" class="loading-text">Processing...</div>
             </div>
             <div id="resultsView" class="results-view" style="display: none;">
                 <div class="results-header">
@@ -1557,6 +1721,10 @@
                     <div class="results-column">
                         <div class="results-column-header">
                             <h3>Enhanced Text</h3>
+                            <button id="copyResultBtn" class="copy-btn" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                Copy
+                            </button>
                         </div>
                         <div class="results-content processed">
                             <p id="processedText"></p>
@@ -1687,6 +1855,14 @@
         </div>
     </div>
 
+    <!-- Error Toast -->
+    <div id="errorToast" class="error-toast">
+        <span id="errorToastMsg"></span>
+        <button class="error-toast-close" id="errorToastClose">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal settings-modal">
         <div class="settings-header">
@@ -1753,6 +1929,10 @@
                     </svg>
                 </div>
             </div>
+            <label class="settings-toggle-row" for="hideTonePanelToggle">
+                <span class="settings-toggle-label">Hide tone panel</span>
+                <input type="checkbox" id="hideTonePanelToggle" />
+            </label>
         </div>
 
         <div class="settings-section" style="display: none;">
@@ -1768,6 +1948,20 @@
 
     <!-- Add Lottie script with load event listener -->
     <script>
+        // Error toast
+        let _errorDismissTimer;
+        function showError(msg) {
+            const toast = document.getElementById('errorToast');
+            document.getElementById('errorToastMsg').textContent = msg;
+            toast.classList.add('visible');
+            clearTimeout(_errorDismissTimer);
+            _errorDismissTimer = setTimeout(() => toast.classList.remove('visible'), 4500);
+        }
+        document.getElementById('errorToastClose').addEventListener('click', () => {
+            clearTimeout(_errorDismissTimer);
+            document.getElementById('errorToast').classList.remove('visible');
+        });
+
         // UI Elements
         const textEditor = document.getElementById('textEditor');
         const translateButton = document.getElementById('translateButton');
@@ -1778,14 +1972,35 @@
         const closeButton = document.getElementById('closeSettings');
         const targetLanguageSelect = document.getElementById('targetLanguageSelect');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const loadingText = document.getElementById('loadingText');
+
+        function setLoadingMessage(operation) {
+            if (!loadingText) return;
+            const messages = {
+                translate: 'Translating...',
+                enhance: 'Improving...',
+                shorten: 'Shortening...',
+                'quality-check': 'Analyzing...'
+            };
+            loadingText.textContent = messages[operation] || 'Processing...';
+        }
         const resultsView = document.getElementById('resultsView');
         const backToEditButton = document.getElementById('backToEdit');
         const applyToFigmaButton = document.getElementById('applyToFigma');
         const themeSelect = document.getElementById('themeSelect');
+        const hideTonePanelToggle = document.getElementById('hideTonePanelToggle');
         const qualityCheckButton = document.getElementById('qualityCheckButton');
         const qualityCheckResults = document.getElementById('qualityCheckResults');
         let currentProcessedTexts = [];
         let selectedTexts = new Map();
+        let currentTone = 'Professional';
+        let hideTonePanel = false;
+
+        function applyToneSectionVisibility() {
+            const toneSection = document.getElementById('toneSection');
+            if (!toneSection) return;
+            toneSection.style.display = hideTonePanel ? 'none' : 'block';
+        }
 
         // Initialize theme and request initial data
         let initialized = false;
@@ -1797,7 +2012,9 @@
             parent.postMessage({ pluginMessage: { type: 'get-language' } }, '*');
             parent.postMessage({ pluginMessage: { type: 'get-selected-text' } }, '*');
             parent.postMessage({ pluginMessage: { type: 'get-brand-guidelines' } }, '*');
-            
+            parent.postMessage({ pluginMessage: { type: 'get-tone' } }, '*');
+            parent.postMessage({ pluginMessage: { type: 'get-hide-tone-panel' } }, '*');
+
             // Initialize theme
             initializeTheme();
             
@@ -1817,6 +2034,7 @@
             textEditor.style.display = 'none';
             document.querySelector('.action-panel').style.display = 'none';
             document.querySelector('.section-title').style.display = 'none';
+            document.getElementById('toneSection').style.display = 'none';
             document.querySelector('.settings-button-container').classList.add('hidden');
             resultsView.style.display = 'block';
             loadingIndicator.style.display = 'none';
@@ -1826,6 +2044,7 @@
             textEditor.style.display = 'block';
             document.querySelector('.action-panel').style.display = 'flex';
             document.querySelector('.section-title').style.display = 'block';
+            applyToneSectionVisibility();
             document.querySelector('.settings-button-container').classList.remove('hidden');
             resultsView.style.display = 'none';
             loadingIndicator.style.display = 'none';
@@ -1847,6 +2066,7 @@
                 });
                 
                 // Show loading state
+                setLoadingMessage(endpoint);
                 loadingIndicator.style.display = 'flex';
                 textEditor.style.display = 'none';
                 document.querySelector('.action-panel').style.display = 'none';
@@ -1903,7 +2123,7 @@
                 loadingIndicator.style.display = 'none';
                 textEditor.style.display = 'block';
                 document.querySelector('.action-panel').style.display = 'flex';
-                alert(`${endpoint} failed. Please try again.`);
+                showError(`${endpoint.charAt(0).toUpperCase() + endpoint.slice(1)} failed. Please try again.`);
             }
         }
 
@@ -1914,7 +2134,8 @@
             await handleAPICall('translate', {
                 text: textEditor.value,
                 targetLanguage: targetLanguageSelect.value,
-                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? '',
+                tone: currentTone
             });
         });
 
@@ -1923,7 +2144,8 @@
             if (!textEditor.value.trim()) return;
             await handleAPICall('enhance', {
                 text: textEditor.value,
-                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? '',
+                tone: currentTone
             });
         });
 
@@ -1932,7 +2154,18 @@
             if (!textEditor.value.trim()) return;
             await handleAPICall('shorten', {
                 text: textEditor.value,
-                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
+                brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? '',
+                tone: currentTone
+            });
+        });
+
+        // Tone selector click handlers
+        document.querySelectorAll('.tone-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentTone = btn.dataset.tone;
+                document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                parent.postMessage({ pluginMessage: { type: 'save-tone', tone: currentTone } }, '*');
             });
         });
 
@@ -2056,34 +2289,52 @@
                 case 'process-retry':
                     console.log('[Process Retry] Starting:', msg);
                     try {
+                        setLoadingMessage(msg.operation);
                         // Call API with correct operation
                         const response = await callAPI(msg.operation, {
                             text: msg.texts[0].text,
                             targetLanguage: msg.params.targetLanguage,
                             brandGuidelines: document.getElementById('brandGuidelinesInput')?.value ?? ''
                         });
-                        
+
                         // Get the correct response property based on operation
                         const processedText = msg.operation === 'translate' ? response.translatedText :
                                             msg.operation === 'shorten' ? response.shortenedText :
                                             response.enhancedText;
-                        
+
                         // Show results with correct operation type
                         showResults(
-                            [msg.texts[0].text], 
+                            [msg.texts[0].text],
                             [{ id: msg.texts[0].id, text: processedText }],
                             msg.operation
                         );
-                        
+
                         // Hide loading, show results
                         loadingIndicator.style.display = 'none';
                         resultsView.style.display = 'block';
-                        
+
                     } catch (error) {
                         console.error('[Process Retry] Error:', error);
                         loadingIndicator.style.display = 'none';
-                        alert('Failed to process text. Please try again.');
+                        showError('Failed to process text. Please try again.');
                     }
+                    break;
+
+                case 'set-tone':
+                    if (msg.tone) {
+                        currentTone = msg.tone;
+                        document.querySelectorAll('.tone-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.tone === msg.tone);
+                        });
+                    }
+                    break;
+
+                case 'set-hide-tone-panel':
+                    hideTonePanel = !!msg.hidden;
+                    if (hideTonePanelToggle) {
+                        hideTonePanelToggle.checked = hideTonePanel;
+                    }
+                    applyToneSectionVisibility();
                     break;
             }
         };
@@ -2149,6 +2400,19 @@
             settingsModal.classList.remove('visible');
         });
 
+        if (hideTonePanelToggle) {
+            hideTonePanelToggle.addEventListener('change', () => {
+                hideTonePanel = hideTonePanelToggle.checked;
+                applyToneSectionVisibility();
+                parent.postMessage({
+                    pluginMessage: {
+                        type: 'save-hide-tone-panel',
+                        hidden: hideTonePanel
+                    }
+                }, '*');
+            });
+        }
+
         // Close modal when clicking outside
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
@@ -2202,7 +2466,7 @@
             
             if (!currentProcessedTexts || currentProcessedTexts.length === 0) {
                 console.error('No processed texts available to apply');
-                alert('No processed text available to apply. Please try the operation again.');
+                showError('No processed text available. Please run the operation again.');
                 return;
             }
             
@@ -2230,11 +2494,13 @@
             
             try {
                 // Show loading state
+                setLoadingMessage('quality-check');
                 loadingIndicator.style.display = 'block';
                 textEditor.style.display = 'none';
                 document.querySelector('.action-panel').style.display = 'none';
                 document.querySelector('.section-title').style.display = 'none';
-                
+                document.getElementById('toneSection').style.display = 'none';
+
                 // Current guidelines from settings (same source as other tools)
                 const brandGuidelines = document.getElementById('brandGuidelinesInput')?.value ?? '';
                 
@@ -2275,7 +2541,7 @@
                 console.error('Quality check error:', error);
                 loadingIndicator.style.display = 'none';
                 showEditor();
-                alert('Quality check failed. Please try again. ' + error.message);
+                showError('Quality check failed. Please try again.');
             }
         });
 
@@ -2295,6 +2561,7 @@
             textEditor.style.display = 'block';
             document.querySelector('.action-panel').style.display = 'flex';
             document.querySelector('.section-title').style.display = 'block';
+            applyToneSectionVisibility();
             document.querySelector('.settings-button-container').classList.remove('hidden');
             resultsView.style.display = 'none';
             qualityCheckResults.style.display = 'none';
@@ -2585,6 +2852,7 @@
             console.log('[Retry] Using operation:', currentOperation);
             
             // Show loading state
+            setLoadingMessage(currentOperation);
             loadingIndicator.style.display = 'flex';
             resultsView.style.display = 'none';
             
@@ -2598,6 +2866,18 @@
             }, '*');
         });
 
+        // Copy result to clipboard
+        document.getElementById('copyResultBtn').addEventListener('click', () => {
+            const text = document.getElementById('processedText').textContent;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyResultBtn');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Copied!';
+                setTimeout(() => { btn.innerHTML = original; }, 2000);
+            }).catch(() => showError('Could not copy to clipboard.'));
+        });
+
         // Update the back button handler
         backToEditButton.addEventListener('click', () => {
             console.log('[Back] Returning to editor view');
@@ -2608,6 +2888,9 @@
             // Show editor and action panel
             textEditor.style.display = 'block';
             document.querySelector('.action-panel').style.display = 'flex';
+            document.querySelector('.section-title').style.display = 'block';
+            applyToneSectionVisibility();
+            document.querySelector('.settings-button-container').classList.remove('hidden');
             
             // Clear the results content
             document.getElementById('originalText').innerHTML = '';
@@ -2623,11 +2906,13 @@
         // Update the showResults function to handle multiple texts properly
         function showResults(originalTexts, processedTexts, operation) {
             console.log('[Results] Showing results view');
-            
+
             // Hide editor and action panel
             textEditor.style.display = 'none';
             document.querySelector('.action-panel').style.display = 'none';
-            
+            document.querySelector('.section-title').style.display = 'none';
+            document.getElementById('toneSection').style.display = 'none';
+
             // Show results container
             resultsView.style.display = 'block';
             
