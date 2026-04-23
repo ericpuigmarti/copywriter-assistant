@@ -88,9 +88,10 @@ TRANSLATE_SYSTEM_PROMPT = (
 # Test endpoint
 @app.route('/test', methods=['GET'])
 def test():
+    in_prod = config is Config.Production
     return jsonify({
         'status': 'ok',
-        'environment': os.getenv('ENVIRONMENT', 'development'),
+        'environment': 'production' if in_prod else 'development',
         'server_url': config.SERVER_URL,
         'debug_mode': config.DEBUG
     })

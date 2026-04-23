@@ -16,7 +16,14 @@ class Config:
         DEBUG = False
 
     @staticmethod
+    def is_production():
+        """True on explicit production, or on Render (``RENDER=true``) without forcing dev."""
+        if os.getenv("ENVIRONMENT") == "production":
+            return True
+        if os.getenv("RENDER", "").lower() == "true":
+            return True
+        return False
+
+    @staticmethod
     def get_config():
-        if os.getenv('ENVIRONMENT') == 'production':
-            return Config.Production
-        return Config.Development 
+        return Config.Production if Config.is_production() else Config.Development 
