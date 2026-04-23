@@ -3,6 +3,17 @@
 All notable changes to the Copywriting Assistant plugin will be documented in this file.
 > Note: When updating this changelog, remember to update the version badge and details in README.md
 
+## [0.3.10] - 2026-04-23
+### Changed
+- **BYOK (bring your own OpenAI API key):** On first run, the plugin shows a blocking screen until the user saves a key; Settings can update it later. The key is stored in Figma `clientStorage` and sent as `Authorization: Bearer` on each API request. The server builds a per-request OpenAI client and no longer uses a shared `OPENAI_API_KEY` for end-user traffic.
+- Temporarily removed the tone selection UI (main panel and Settings “Hide tone panel” toggle) by commenting it out in `ui.html` and the related `figma.clientStorage` sync in `code.js` (search for `TONE PANEL` in those files). Client storage keys `tone` and `hideTonePanel` are unchanged for future restore.
+- Improve and Shorten API user prompts (`/enhance`, `/shorten` in `app.py`) now instruct the model to follow voice/tone from **brand guidelines first**, with the JSON `tone` field as fallback when guidelines do not specify voice or tone.
+- Hid the **Premium** label next to Brand Guidelines in Settings. The markup and styles are **commented out** (search for `PREMIUM TAG` in `ui.html`) so we can bring it back if we introduce paid tiers later. No change to how brand guidelines work in the product.
+
+### Technical
+- Flask: CORS and `Access-Control-Allow-Headers` include `Authorization` for browser preflight from the Figma plugin UI.
+- The plugin still sends a default `tone` value in API requests; without the panel it stays `Professional`. Server-side copy prioritizes brand guidelines over that default for improve/shorten only. Translation (`/translate`) is unchanged.
+
 ## [0.3.9] - 2024-04-17
 ### Fixed
 - Fixed text processing to maintain separate text elements instead of concatenating them

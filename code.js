@@ -56,18 +56,18 @@ async function initializeSettings() {
             guidelines: savedGuidelines || ''
         });
 
-        // Get saved tone
-        const savedTone = await figma.clientStorage.getAsync('tone');
-        figma.ui.postMessage({
-            type: 'set-tone',
-            tone: savedTone || 'Professional'
-        });
-
-        const hideTonePanel = await figma.clientStorage.getAsync('hideTonePanel');
-        figma.ui.postMessage({
-            type: 'set-hide-tone-panel',
-            hidden: !!hideTonePanel
-        });
+        // TONE PANEL (temporarily disabled - see CHANGELOG)
+        // const savedTone = await figma.clientStorage.getAsync('tone');
+        // figma.ui.postMessage({
+        //     type: 'set-tone',
+        //     tone: savedTone || 'Professional'
+        // });
+        //
+        // const hideTonePanel = await figma.clientStorage.getAsync('hideTonePanel');
+        // figma.ui.postMessage({
+        //     type: 'set-hide-tone-panel',
+        //     hidden: !!hideTonePanel
+        // });
 
     } catch (error) {
         console.error('[initializeSettings] Error:', error);
@@ -203,9 +203,56 @@ figma.on('selectionchange', async () => {
 // Handle messages from UI
 figma.ui.onmessage = async (msg) => {
     console.log('[Message] Type:', msg.type);
-    console.log('[Message] Full data:', msg);
+    if (msg.type === 'save-api-key') {
+        console.log('[Message] (save-api-key, apiKey redacted)');
+    } else {
+        console.log('[Message] Full data:', msg);
+    }
 
     switch (msg.type) {
+        case 'get-api-key':
+            try {
+                const key = await figma.clientStorage.getAsync('openaiApiKey');
+                const s = typeof key === 'string' ? key.trim() : '';
+                figma.ui.postMessage({
+                    type: 'api-key-status',
+                    hasKey: s.length > 0,
+                    apiKey: s.length > 0 ? s : null
+                });
+            } catch (error) {
+                console.error('[get-api-key] Error:', error);
+                figma.ui.postMessage({
+                    type: 'api-key-status',
+                    hasKey: false,
+                    apiKey: null
+                });
+            }
+            break;
+
+        case 'save-api-key':
+            try {
+                const k = (msg.apiKey != null && String(msg.apiKey).trim()) || '';
+                if (!k) {
+                    await figma.clientStorage.setAsync('openaiApiKey', '');
+                    figma.ui.postMessage({
+                        type: 'api-key-status',
+                        hasKey: false,
+                        apiKey: null
+                    });
+                    break;
+                }
+                await figma.clientStorage.setAsync('openaiApiKey', k);
+                figma.ui.postMessage({
+                    type: 'api-key-status',
+                    hasKey: true,
+                    apiKey: k
+                });
+            } catch (error) {
+                console.error('[save-api-key] Error:', error);
+                figma.notify('Error saving API key');
+            }
+            break;
+
         case 'get-selected-text':
             console.log('Received get-selected-text request');
             await handleSelection();
@@ -316,31 +363,32 @@ figma.ui.onmessage = async (msg) => {
             }
             break;
 
-        case 'save-tone':
-            await figma.clientStorage.setAsync('tone', msg.tone);
-            break;
-
-        case 'get-tone':
-            const savedTone = await figma.clientStorage.getAsync('tone');
-            figma.ui.postMessage({ type: 'set-tone', tone: savedTone || 'Professional' });
-            break;
-
-        case 'save-hide-tone-panel':
-            try {
-                await figma.clientStorage.setAsync('hideTonePanel', msg.hidden === true);
-            } catch (error) {
-                console.error('Error saving hide tone panel:', error);
-            }
-            break;
-
-        case 'get-hide-tone-panel':
-            try {
-                const hidden = await figma.clientStorage.getAsync('hideTonePanel');
-                figma.ui.postMessage({ type: 'set-hide-tone-panel', hidden: !!hidden });
-            } catch (error) {
-                console.error('[get-hide-tone-panel] Error:', error);
-            }
-            break;
+        // TONE PANEL (temporarily disabled - see CHANGELOG)
+        // case 'save-tone':
+        //     await figma.clientStorage.setAsync('tone', msg.tone);
+        //     break;
+        //
+        // case 'get-tone':
+        //     const savedTone = await figma.clientStorage.getAsync('tone');
+        //     figma.ui.postMessage({ type: 'set-tone', tone: savedTone || 'Professional' });
+        //     break;
+        //
+        // case 'save-hide-tone-panel':
+        //     try {
+        //         await figma.clientStorage.setAsync('hideTonePanel', msg.hidden === true);
+        //     } catch (error) {
+        //         console.error('Error saving hide tone panel:', error);
+        //     }
+        //     break;
+        //
+        // case 'get-hide-tone-panel':
+        //     try {
+        //         const hidden = await figma.clientStorage.getAsync('hideTonePanel');
+        //         figma.ui.postMessage({ type: 'set-hide-tone-panel', hidden: !!hidden });
+        //     } catch (error) {
+        //         console.error('[get-hide-tone-panel] Error:', error);
+        //     }
+        //     break;
 
         case 'get-brand-guidelines':
             console.log('Getting saved brand guidelines');

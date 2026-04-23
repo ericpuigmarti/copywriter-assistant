@@ -22,20 +22,26 @@ load_dotenv()
 app = Flask(__name__)
 config = Config.get_config()
 
-# Configure CORS
+# Configure CORS (Authorization required for browser fetch with Bearer token from Figma plugin UI)
 CORS(app, resources={
     r"/*": {
         "origins": ["https://www.figma.com"],
         "methods": ["POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Accept"],
+        "allow_headers": ["Content-Type", "Accept", "Authorization"],
         "expose_headers": ["Access-Control-Allow-Origin"],
         "supports_credentials": False,
         "send_wildcard": False
     }
 })
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+def get_openai_client_from_request():
+    """Build a per-request client from ``Authorization: Bearer <key>``. No server env key."""
+    auth = request.headers.get("Authorization") or ""
+    key = auth[7:].strip() if auth.startswith("Bearer ") else ""
+    if not key:
+        return None, (jsonify({"error": "API key required"}), 401)
+    return OpenAI(api_key=key), None
 
 
 def load_system_prompt(filename):
@@ -55,6 +61,15 @@ def brand_guidelines_block(data):
         raw = ''
     text = raw.strip() if isinstance(raw, str) else ''
     return text if text else 'No specific brand guidelines provided.'
+
+
+def voice_tone_user_instructions(tone: str) -> str:
+    """For enhance/shorten: brand guidelines first; request ``tone`` as fallback."""
+    return (
+        "Voice and tone: If the Brand Guidelines above describe voice, tone, or style, follow them. "
+        "If they do not specify voice or tone (or only state that no specific brand guidelines were "
+        f"provided), write in a {tone} tone."
+    )
 
 
 ENHANCE_SYSTEM_PROMPT = (
@@ -83,6 +98,10 @@ def test():
 @app.route('/enhance', methods=['POST'])
 def enhance():
     try:
+        client, auth_error = get_openai_client_from_request()
+        if auth_error:
+            return auth_error
+
         data = request.json or {}
         text = data.get('text', '')
         guidelines = brand_guidelines_block(data)
@@ -101,7 +120,7 @@ def enhance():
 
 Brand Guidelines:
 {guidelines}
-Tone: Write in a {tone} tone.
+{voice_tone_user_instructions(tone)}
 """}
             ]
         )
@@ -116,6 +135,10 @@ Tone: Write in a {tone} tone.
 @app.route('/shorten', methods=['POST'])
 def shorten():
     try:
+        client, auth_error = get_openai_client_from_request()
+        if auth_error:
+            return auth_error
+
         data = request.json or {}
         text = data.get('text', '')
         guidelines = brand_guidelines_block(data)
@@ -134,7 +157,7 @@ def shorten():
 
 Brand Guidelines:
 {guidelines}
-Tone: Write in a {tone} tone.
+{voice_tone_user_instructions(tone)}
 """}
             ]
         )
@@ -150,6 +173,10 @@ Tone: Write in a {tone} tone.
 def translate():
     start_time = time.time()
     try:
+        client, auth_error = get_openai_client_from_request()
+        if auth_error:
+            return auth_error
+
         data = request.json or {}
         text = data.get('text', '')
         target_language = data.get('targetLanguage', '')
@@ -221,7 +248,11 @@ IMPORTANT: Respond only in this JSON format:
 @app.route('/quality-check', methods=['POST'])
 def quality_check():
     try:
-        data = request.json
+        client, auth_error = get_openai_client_from_request()
+        if auth_error:
+            return auth_error
+
+        data = request.json or {}
         text = data.get('text', '')
         brand_guidelines = data.get('brandGuidelines', '')
 
@@ -327,12 +358,11 @@ def after_request(response):
     origin = request.headers.get('Origin')
     if origin:  # Changed to handle any origin, will be filtered by CORS
         response.headers['Access-Control-Allow-Origin'] = origin
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Accept'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Accept,Authorization'
     response.headers['Access-Control-Allow-Methods'] = 'POST,OPTIONS'
     return response
 
 if __name__ == '__main__':
-    logger.info("Starting server...")
-    logger.info(f"OpenAI API key present: {'Yes' if os.getenv('OPENAI_API_KEY') else 'No'}")
+    logger.info("Starting server (BYOK: API key from Authorization on each request)...")
     logger.info("OpenAI chat model: %s", Config.OPENAI_CHAT_MODEL)
     app.run(debug=True, port=5000)
