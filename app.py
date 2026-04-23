@@ -86,12 +86,13 @@ def enhance():
         data = request.json or {}
         text = data.get('text', '')
         guidelines = brand_guidelines_block(data)
-        
+        tone = (data or {}).get('tone', 'Professional')
+
         if not text:
             return jsonify({'error': 'No text provided'}), 400
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=Config.OPENAI_CHAT_MODEL,
             messages=[
                 {"role": "system", "content": ENHANCE_SYSTEM_PROMPT},
                 {"role": "user", "content": f"""Enhance this text:
@@ -100,6 +101,7 @@ def enhance():
 
 Brand Guidelines:
 {guidelines}
+Tone: Write in a {tone} tone.
 """}
             ]
         )
@@ -117,12 +119,13 @@ def shorten():
         data = request.json or {}
         text = data.get('text', '')
         guidelines = brand_guidelines_block(data)
-        
+        tone = (data or {}).get('tone', 'Professional')
+
         if not text:
             return jsonify({'error': 'No text provided'}), 400
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=Config.OPENAI_CHAT_MODEL,
             messages=[
                 {"role": "system", "content": SHORTEN_SYSTEM_PROMPT},
                 {"role": "user", "content": f"""Create a shorter version of this text:
@@ -131,6 +134,7 @@ def shorten():
 
 Brand Guidelines:
 {guidelines}
+Tone: Write in a {tone} tone.
 """}
             ]
         )
@@ -150,14 +154,15 @@ def translate():
         text = data.get('text', '')
         target_language = data.get('targetLanguage', '')
         guidelines = brand_guidelines_block(data)
-        
+        tone = (data or {}).get('tone', 'Professional')
+
         if not text or not target_language:
             return jsonify({'error': 'Text and target language are required'}), 400
 
         # Log API call start
         api_start = time.time()
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=Config.OPENAI_CHAT_MODEL,
             messages=[
                 {"role": "system", "content": TRANSLATE_SYSTEM_PROMPT},
                 {"role": "user", "content": f"""Translate this text to {target_language}:
@@ -166,6 +171,7 @@ def translate():
 
 Brand Guidelines:
 {guidelines}
+Tone: Write in a {tone} tone.
 """}
             ]
         )
@@ -243,7 +249,7 @@ Remember to respond only in the specified JSON format.
         # Call OpenAI with better error handling
         try:
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model=Config.OPENAI_CHAT_MODEL,
                 messages=messages,
                 temperature=0.7,
                 max_tokens=1000,
@@ -328,4 +334,5 @@ def after_request(response):
 if __name__ == '__main__':
     logger.info("Starting server...")
     logger.info(f"OpenAI API key present: {'Yes' if os.getenv('OPENAI_API_KEY') else 'No'}")
+    logger.info("OpenAI chat model: %s", Config.OPENAI_CHAT_MODEL)
     app.run(debug=True, port=5000)

@@ -3,6 +3,8 @@ import os
 class Config:
     # Base configuration
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+    # Fastest default for chat routes; override e.g. OPENAI_CHAT_MODEL=gpt-5.4-mini for heavier tasks
+    OPENAI_CHAT_MODEL = os.getenv("OPENAI_CHAT_MODEL", "gpt-5.4-nano")
     
     # Environment-specific configurations
     class Development:

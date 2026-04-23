@@ -11,13 +11,9 @@ class TestServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()['status'], 'ok')
 
-    def test_process_text(self):
-        test_data = {
-            'text': 'Hello world',
-            'operation': 'enhance'
-        }
-        response = self.app.post('/process', json=test_data)
-        self.assertEqual(response.status_code, 200)
+    def test_enhance_requires_text(self):
+        response = self.app.post('/enhance', json={})
+        self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()
